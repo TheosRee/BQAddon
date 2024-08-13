@@ -1,1 +1,1 @@
-There is no changelog at the start.
+Adds the working `chat` objective.

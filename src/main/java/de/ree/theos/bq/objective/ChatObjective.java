@@ -118,5 +118,7 @@ public class ChatObjective extends Objective implements Listener {
                         + "' because it is not an variable objective!");
             }
         }
+        
+        completeObjective(onlineProfile);
     }
 }
