@@ -16,6 +16,15 @@ which is "too new" for what BetonQuest supports.
 
 # Features
 
+## Item
+
+The `simple` item is now allowed to use the new custom model data format and `item-name`.
+
+This means you can now load and save a list of floats and more important use the
+`item-model` and `no-item-model` arguments similar to `custom-model-data` and `no-custom-model-data`.
+
+Also, the potion handling is improved and supports data driven potion/"mob" effects.
+
 ## Objectives
 
 ### - `chat`

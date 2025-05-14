@@ -1,0 +1,127 @@
+package de.ree.theos.bq.item;
+
+import org.betonquest.betonquest.api.profile.Profile;
+import org.betonquest.betonquest.api.quest.QuestException;
+import org.betonquest.betonquest.instruction.Instruction;
+import org.betonquest.betonquest.item.QuestItem;
+import org.betonquest.betonquest.item.QuestItemWrapper;
+import org.betonquest.betonquest.item.SimpleQuestItem;
+import org.betonquest.betonquest.item.typehandler.*;
+import org.betonquest.betonquest.kernel.registry.TypeFactory;
+import org.betonquest.betonquest.util.BlockSelector;
+import org.betonquest.betonquest.util.Utils;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+/**
+ * Creates {@link SimpleQuestItem}s from {@link Instruction}s.
+ */
+public class UpdatedSimpleItemFactory implements TypeFactory<QuestItemWrapper> {
+
+    /**
+     * Creates a new simple Quest Item Factory.
+     */
+    public UpdatedSimpleItemFactory() {
+    }
+
+    private QuestItem parseInstruction(final String material, final List<String> arguments) throws QuestException {
+        final BlockSelector selector = new BlockSelector(material);
+
+        final NameHandler name = new UpdatedNameHandler();
+        final LoreHandler lore = new LoreHandler();
+
+        final List<ItemMetaHandler<?>> handlers = List.of(
+                new DurabilityHandler(),
+                new UpdatedCustomModelDataHandler(),
+                new UnbreakableHandler(),
+                new FlagHandler(),
+                name,
+                lore,
+                new EnchantmentsHandler(),
+                new UpdatedPotionHandler(),
+                new BookHandler(),
+                new HeadHandler(),
+                new ColorHandler(),
+                new FireworkHandler()
+        );
+
+        if (!arguments.isEmpty()) {
+            fillHandler(handlers, arguments);
+        }
+        return new SimpleQuestItem(selector, handlers, name, lore);
+    }
+
+    @Override
+    public QuestItemWrapper parseInstruction(final Instruction instruction) throws QuestException {
+        final String material = instruction.next();
+        final List<String> arguments;
+        if (instruction.hasNext()) {
+            final List<String> valueParts = instruction.getValueParts();
+            arguments = valueParts.subList(1, valueParts.size());
+        } else {
+            arguments = List.of();
+        }
+        return new ShallowWrapper(parseInstruction(material, arguments));
+    }
+
+    private void fillHandler(final List<ItemMetaHandler<?>> handlers, final List<String> arguments) throws QuestException {
+        final Map<String, ItemMetaHandler<?>> keyToHandler = new HashMap<>();
+        for (final ItemMetaHandler<?> handler : handlers) {
+            for (final String key : handler.keys()) {
+                keyToHandler.put(key, handler);
+            }
+        }
+        for (final String part : arguments) {
+            if (part.isEmpty()) {
+                continue; //catch empty string caused by multiple whitespaces in instruction split
+            }
+
+            final String argumentName = getArgumentName(part.toLowerCase(Locale.ROOT));
+            final String data = getArgumentData(part);
+
+            final ItemMetaHandler<?> handler = Utils.getNN(keyToHandler.get(argumentName), "Unknown argument: " + argumentName);
+            handler.set(argumentName, data);
+        }
+    }
+
+    /**
+     * Returns the data behind the argument name.
+     * If the argument does not contain a colon, it returns the full argument.
+     *
+     * @param argument the full argument
+     * @return the data behind the argument name
+     */
+    private String getArgumentData(final String argument) {
+        return argument.substring(argument.indexOf(':') + 1);
+    }
+
+    /**
+     * Returns the argument name.
+     * If the argument does not contain a colon, it returns the full argument.
+     *
+     * @param argument the full argument
+     * @return the argument name
+     */
+    private String getArgumentName(final String argument) {
+        if (argument.contains(":")) {
+            return argument.substring(0, argument.indexOf(':'));
+        }
+        return argument;
+    }
+
+    /**
+     * A wrapper for a quest Item without variables to resolve.
+     *
+     * @param questItem the quest item to wrap.
+     */
+    private record ShallowWrapper(QuestItem questItem) implements QuestItemWrapper {
+        @Override
+        public QuestItem getItem(@Nullable final Profile profile) {
+            return questItem;
+        }
+    }
+}

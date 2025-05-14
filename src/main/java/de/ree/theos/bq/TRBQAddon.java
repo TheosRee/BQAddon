@@ -1,11 +1,14 @@
 package de.ree.theos.bq;
 
+import de.ree.theos.bq.item.UpdatedSimpleItemFactory;
+import de.ree.theos.bq.item.UpdatedSimpleQuestItemSerializer;
 import de.ree.theos.bq.objective.ChatObjectiveFactory;
 import de.ree.theos.bq.objective.PlaceBlockStoreLocationObjectiveFactory;
 import de.ree.theos.bq.playtime.PlaytimeConditionFactory;
 import de.ree.theos.bq.playtime.PlaytimeObjectiveFactory;
 import de.ree.theos.bq.playtime.PlaytimeVariableFactory;
 import org.betonquest.betonquest.BetonQuest;
+import org.betonquest.betonquest.kernel.registry.feature.ItemTypeRegistry;
 import org.betonquest.betonquest.kernel.registry.quest.QuestTypeRegistries;
 import org.betonquest.betonquest.quest.PrimaryServerThreadData;
 import org.bukkit.Server;
@@ -27,5 +30,9 @@ public final class TRBQAddon extends JavaPlugin {
         questRegistries.condition().register("playtime", new PlaytimeConditionFactory(data));
         questRegistries.objective().register("playtime", new PlaytimeObjectiveFactory());
         questRegistries.variable().register("playtime", new PlaytimeVariableFactory());
+
+        final ItemTypeRegistry item = betonQuest.getFeatureRegistries().item();
+        item.register("simple", new UpdatedSimpleItemFactory());
+        item.registerSerializer("simple", new UpdatedSimpleQuestItemSerializer());
     }
 }
