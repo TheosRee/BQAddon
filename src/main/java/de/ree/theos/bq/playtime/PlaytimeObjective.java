@@ -59,7 +59,7 @@ public class PlaytimeObjective extends Objective {
      */
     public PlaytimeObjective(final Instruction instruction, final Variable<Number> timePlayed, final Variable<TimeUnit> timeUnit,
             final Variable<Number> interval) throws QuestException {
-        super(instruction);
+        super(instruction, PlaytimeData.class);
         this.timePlayed = timePlayed;
         this.timeUnit = timeUnit;
         this.interval = interval;
