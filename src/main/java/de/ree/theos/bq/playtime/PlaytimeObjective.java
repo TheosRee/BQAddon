@@ -33,6 +33,11 @@ public class PlaytimeObjective extends Objective {
     private final Variable<Number> timePlayed;
 
     /**
+     * Starting mode to eventually offset from the already present value at objective start.
+     */
+    private final Variable<CountingMode> mode;
+
+    /**
      * The time unit used for starting the objective.
      */
     private final Variable<TimeUnit> timeUnit;
@@ -52,15 +57,18 @@ public class PlaytimeObjective extends Objective {
      * Constructor for the DelayObjective.
      *
      * @param instruction the instruction that created this objective
+     * @param mode        the starting mode to eventually offset from the already present value at start
      * @param timeUnit    the unit of time the player has to play
      * @param interval    the interval in ticks at which the objective checks if the time played
      * @param timePlayed  the time in
      * @throws QuestException if there is an error in the instruction
      */
-    public PlaytimeObjective(final Instruction instruction, final Variable<Number> timePlayed, final Variable<TimeUnit> timeUnit,
+    public PlaytimeObjective(final Instruction instruction, final Variable<Number> timePlayed, final Variable<CountingMode> mode,
+            final Variable<TimeUnit> timeUnit,
             final Variable<Number> interval) throws QuestException {
         super(instruction, PlaytimeData.class);
         this.timePlayed = timePlayed;
+        this.mode = mode;
         this.timeUnit = timeUnit;
         this.interval = interval;
     }
@@ -85,7 +93,7 @@ public class PlaytimeObjective extends Objective {
                     completeObjective(profile);
                 }
             }
-        }.runTaskTimer(BetonQuest.getInstance(), 0, interval.getValue(null).longValue()));
+        }.runTaskTimer(BetonQuest.getInstance(), 1, interval.getValue(null).longValue()));
     }
 
     @Override
@@ -97,7 +105,13 @@ public class PlaytimeObjective extends Objective {
 
     @Override
     public String getDefaultDataInstruction(final Profile profile) {
-        return qeHandler.handle(() -> String.valueOf(timeUnit.getValue(profile).getTicks(timePlayed.getValue(profile).longValue())), "");
+        return qeHandler.handle(() -> {
+            final long targetValue = timeUnit.getValue(profile).getTicks(timePlayed.getValue(profile).longValue());
+            return switch (mode.getValue(profile)) {
+                case TOTAL -> String.valueOf(targetValue);
+                case RELATIVE -> String.valueOf(targetValue + profile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME));
+            };
+        }, "");
     }
 
     @Override

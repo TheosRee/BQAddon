@@ -44,9 +44,12 @@ The amount is in the optional unit. The unit defaults to seconds.
 
 ### Objective
 
-The interval is in ticks and defaults to 1200 ticks (= 1 minute).
+The interval is in ticks and defaults to 1200 ticks (= 1 minute).  
+The mode is either `total` or `relative`.
+Total time means the player needs the time at all, also counting time before starting the objective.
+With relative mode only play time after starting the objective counts.
 
-#### Usage: `playtime <amount> [unit:<unit>] [interval:<amount>]`
+#### Usage: `playtime <amount> <mode> [unit:<unit>] [interval:<amount>]`
 
 It also has the `left` and `rawseconds` properties, similar to the `delay` objective.
 

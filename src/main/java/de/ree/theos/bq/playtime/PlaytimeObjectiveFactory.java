@@ -22,8 +22,9 @@ public class PlaytimeObjectiveFactory implements ObjectiveFactory {
     @Override
     public Objective parseInstruction(final Instruction instruction) throws QuestException {
         final Variable<Number> playtime = instruction.get(Argument.NUMBER_NOT_LESS_THAN_ZERO);
+        final Variable<CountingMode> mode = instruction.get(Argument.ENUM(CountingMode.class));
         final Variable<Number> interval = instruction.getValue("interval", Argument.NUMBER_NOT_LESS_THAN_ONE, 1200);
         final Variable<TimeUnit> unit = instruction.getValue("unit", Argument.ENUM(TimeUnit.class), TimeUnit.SECONDS);
-        return new PlaytimeObjective(instruction, playtime, unit, interval);
+        return new PlaytimeObjective(instruction, playtime, mode, unit, interval);
     }
 }
