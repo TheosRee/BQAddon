@@ -29,3 +29,24 @@ The optional `cancel` argument cancels the chat message.
 Like with every `Objective` you can define `events:` and `conditions:`.
 
 #### Usage: `chat variable:<VariableObjectiveID>#<Key> cancel`
+
+## Playtime
+
+Works with the total ingame playtime.
+The amount is in the optional unit. The unit defaults to seconds.
+
+### Condition
+
+#### Usage: `playtime <amount> [unit:<unit>]`
+
+### Objective
+
+The interval is in ticks and defaults to 1200 ticks (= 1 minute).
+
+#### Usage: `playtime <amount> [unit:<unit>] [interval:<amount>]`
+
+It also has the `left` and `rawseconds` properties, similar to the `delay` objective.
+
+### Variable
+
+#### Usage: `%playtime.<amount>%` or `%playtime.<amount>.<unit>%`

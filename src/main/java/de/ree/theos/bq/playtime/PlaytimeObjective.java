@@ -1,0 +1,192 @@
+package de.ree.theos.bq.playtime;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.betonquest.betonquest.BetonQuest;
+import org.betonquest.betonquest.api.Objective;
+import org.betonquest.betonquest.api.profile.Profile;
+import org.betonquest.betonquest.api.quest.QuestException;
+import org.betonquest.betonquest.config.PluginMessage;
+import org.betonquest.betonquest.instruction.Instruction;
+import org.betonquest.betonquest.instruction.variable.Variable;
+import org.betonquest.betonquest.quest.event.folder.TimeUnit;
+import org.bukkit.Statistic;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
+
+import java.time.Duration;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.Objects;
+
+/**
+ * Player has to play specified amount of time.
+ */
+public class PlaytimeObjective extends Objective {
+    /**
+     * The required play time.
+     */
+    private final Variable<Number> timePlayed;
+
+    /**
+     * The time unit used for starting the objective.
+     */
+    private final Variable<TimeUnit> timeUnit;
+
+    /**
+     * The interval in ticks at which the objective checks if the time is up.
+     */
+    private final Variable<Number> interval;
+
+    /**
+     * The runnable task that checks the progress.
+     */
+    @Nullable
+    private BukkitTask runnable;
+
+    /**
+     * Constructor for the DelayObjective.
+     *
+     * @param instruction the instruction that created this objective
+     * @param timeUnit    the unit of time the player has to play
+     * @param interval    the interval in ticks at which the objective checks if the time played
+     * @param timePlayed  the time in
+     * @throws QuestException if there is an error in the instruction
+     */
+    public PlaytimeObjective(final Instruction instruction, final Variable<Number> timePlayed, final Variable<TimeUnit> timeUnit,
+            final Variable<Number> interval) throws QuestException {
+        super(instruction);
+        this.timePlayed = timePlayed;
+        this.timeUnit = timeUnit;
+        this.interval = interval;
+    }
+
+    @Override
+    public void start() {
+        qeHandler.handle(() -> runnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                final List<Profile> players = new LinkedList<>();
+                for (final Entry<Profile, ObjectiveData> entry : dataMap.entrySet()) {
+                    final Profile profile = entry.getKey();
+                    final PlaytimeData playerData = (PlaytimeData) entry.getValue();
+                    profile.getOnlineProfile().ifPresent(onlineProfile -> {
+                        if (onlineProfile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME) >= playerData.getPlaytime()
+                                && checkConditions(profile)) {
+                            players.add(profile);
+                        }
+                    });
+                }
+                for (final Profile profile : players) {
+                    completeObjective(profile);
+                }
+            }
+        }.runTaskTimer(BetonQuest.getInstance(), 0, interval.getValue(null).longValue()));
+    }
+
+    @Override
+    public void stop() {
+        if (runnable != null) {
+            runnable.cancel();
+        }
+    }
+
+    @Override
+    public String getDefaultDataInstruction(final Profile profile) {
+        return qeHandler.handle(() -> String.valueOf(timeUnit.getValue(profile).getTicks(timePlayed.getValue(profile).longValue())), "");
+    }
+
+    @Override
+    public String getProperty(final String name, final Profile profile) {
+        return switch (name.toLowerCase(Locale.ROOT)) {
+            case "left" -> qeHandler.handle(() -> LegacyComponentSerializer.legacySection().serialize(parseVariableLeft(profile)), "");
+            case "rawseconds" -> String.valueOf(secondsLeft(profile));
+            default -> "";
+        };
+    }
+
+    private long secondsLeft(final Profile profile) {
+        final long wantedTickPlaytime = getPlaytimeData(profile).getPlaytime();
+        final int actualTickPlaytime = profile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME);
+        return (actualTickPlaytime - wantedTickPlaytime) / 20;
+    }
+
+    private Component parseVariableLeft(final Profile profile) throws QuestException {
+        final PluginMessage pluginMessage = BetonQuest.getInstance().getPluginMessage();
+        final Component daysWord = pluginMessage.getMessage(profile, "days");
+        final Component daysWordSingular = pluginMessage.getMessage(profile, "days_singular");
+        final Component hoursWord = pluginMessage.getMessage(profile, "hours");
+        final Component hoursWordSingular = pluginMessage.getMessage(profile, "hours_singular");
+        final Component minutesWord = pluginMessage.getMessage(profile, "minutes");
+        final Component minutesWordSingular = pluginMessage.getMessage(profile, "minutes_singular");
+        final Component secondsWord = pluginMessage.getMessage(profile, "seconds");
+        final Component secondsWordSingular = pluginMessage.getMessage(profile, "seconds_singular");
+
+        final Duration duration = Duration.ofSeconds(secondsLeft(profile));
+
+        final TextComponent.Builder builder = Component.text();
+        buildTimeDescription(builder, daysWord, daysWordSingular, duration.toDaysPart());
+        buildTimeDescription(builder, hoursWord, hoursWordSingular, duration.toHoursPart());
+        buildTimeDescription(builder, minutesWord, minutesWordSingular, duration.toMinutesPart());
+        buildTimeDescription(builder, secondsWord, secondsWordSingular, duration.toSecondsPart());
+
+        return builder.build();
+    }
+
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
+    private void buildTimeDescription(final TextComponent.Builder builder, final Component timeUnitWord,
+            final Component timeUnitSingularWord, final long timeAmount) {
+        if (!builder.children().isEmpty()) {
+            builder.append(Component.space());
+        }
+        if (timeAmount > 1) {
+            builder.append(Component.text(timeAmount)).append(Component.space()).append(timeUnitWord);
+        } else if (timeAmount == 1) {
+            builder.append(Component.text(timeAmount)).append(Component.space()).append(timeUnitSingularWord);
+        }
+    }
+
+    /**
+     * Get the delay data for a profile.
+     *
+     * @throws NullPointerException when {@link #containsPlayer(Profile)} is false
+     */
+    private PlaytimeData getPlaytimeData(final Profile profile) {
+        return Objects.requireNonNull((PlaytimeData) dataMap.get(profile));
+    }
+
+    @Override
+    public String getDefaultDataInstruction() {
+        return "";
+    }
+
+    /**
+     * Data class for the PlaytimeObjective.
+     */
+    public static class PlaytimeData extends ObjectiveData {
+        /**
+         * The required playtime.
+         */
+        private final long timestamp;
+
+        /**
+         * Constructor for the PlaytimeData.
+         *
+         * @param instruction the data of the objective
+         * @param profile     the profile associated with this objective
+         * @param objID       the ID of the objective
+         */
+        public PlaytimeData(final String instruction, final Profile profile, final String objID) {
+            super(instruction, profile, objID);
+            timestamp = Long.parseLong(instruction);
+        }
+
+        private long getPlaytime() {
+            return timestamp;
+        }
+    }
+}

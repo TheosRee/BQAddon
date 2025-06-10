@@ -1,1 +1,1 @@
-Adds the working `chat` objective.
+Adds the `playtime` condition, objective and variable.
