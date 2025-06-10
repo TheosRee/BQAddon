@@ -1,5 +1,8 @@
 ### This Addon is for Testing and Implementing new features for BetonQuest
 
+MC: 1.21.4+
+BQ: 3.0.0-DEV-323+
+
 # Why?
 
 The reason for this Addon is quite simple:
