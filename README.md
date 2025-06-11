@@ -55,4 +55,4 @@ It also has the `left` and `rawseconds` properties, similar to the `delay` objec
 
 ### Variable
 
-#### Usage: `%playtime.<amount>%` or `%playtime.<amount>.<unit>%`
+#### Usage: `%playtime%` or `%playtime.<unit>%`
