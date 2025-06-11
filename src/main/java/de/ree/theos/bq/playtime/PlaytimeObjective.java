@@ -126,7 +126,7 @@ public class PlaytimeObjective extends Objective {
     private long secondsLeft(final Profile profile) {
         final long wantedTickPlaytime = getPlaytimeData(profile).getPlaytime();
         final int actualTickPlaytime = profile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME);
-        return (actualTickPlaytime - wantedTickPlaytime) / 20;
+        return (wantedTickPlaytime - actualTickPlaytime) / 20;
     }
 
     private Component parseVariableLeft(final Profile profile) throws QuestException {
