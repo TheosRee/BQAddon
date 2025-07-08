@@ -33,6 +33,22 @@ Like with every `Objective` you can define `events:` and `conditions:`.
 
 #### Usage: `chat variable:<VariableObjectiveID>#<Key> cancel`
 
+### - `locStore`
+
+Stores the location a placed block in a variable.
+
+The first argument is the [Block Selector](https://betonquest.org/DEV/Documentation/Scripting/Data-Formats/#block-selectors),
+and it requires a `variable` where you define the
+[`variable` objective](https://betonquest.org/DEV/Documentation/Scripting/Building-Blocks/Objectives-List/#variable-variable)
+to store the location into.
+
+It has the optional parameters `loc` and `region`, with which you can define a region
+to place the block (similar to the `block` objective).
+
+Like with every `Objective` you can define `events:` and `conditions:`.
+
+#### Usage: `locStore DIAMOND_BLOCK variable:<VariableObjectiveID>#<Key> loc:<Corner1> region:<Corner2>`
+
 ## Playtime
 
 Works with the total ingame playtime.
@@ -48,6 +64,8 @@ The interval is in ticks and defaults to 1200 ticks (= 1 minute).
 The mode is either `total` or `relative`.
 Total time means the player needs the time at all, also counting time before starting the objective.
 With relative mode only play time after starting the objective counts.
+
+Like with every `Objective` you can define `events:` and `conditions:`.
 
 #### Usage: `playtime <amount> <mode> [unit:<unit>] [interval:<amount>]`
 

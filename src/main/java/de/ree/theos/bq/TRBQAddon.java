@@ -1,6 +1,7 @@
 package de.ree.theos.bq;
 
 import de.ree.theos.bq.objective.ChatObjectiveFactory;
+import de.ree.theos.bq.objective.PlaceBlockStoreLocationObjectiveFactory;
 import de.ree.theos.bq.playtime.PlaytimeConditionFactory;
 import de.ree.theos.bq.playtime.PlaytimeObjectiveFactory;
 import de.ree.theos.bq.playtime.PlaytimeVariableFactory;
@@ -21,6 +22,7 @@ public final class TRBQAddon extends JavaPlugin {
         final PrimaryServerThreadData data = new PrimaryServerThreadData(server, server.getScheduler(), betonQuest);
         final QuestTypeRegistries questRegistries = betonQuest.getQuestRegistries();
         questRegistries.objective().register("chat", new ChatObjectiveFactory());
+        questRegistries.objective().register("locStore", new PlaceBlockStoreLocationObjectiveFactory());
 
         questRegistries.condition().register("playtime", new PlaytimeConditionFactory(data));
         questRegistries.objective().register("playtime", new PlaytimeObjectiveFactory());
