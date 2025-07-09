@@ -8,6 +8,7 @@ import org.betonquest.betonquest.instruction.Instruction;
 import org.betonquest.betonquest.instruction.argument.Argument;
 import org.betonquest.betonquest.instruction.variable.Variable;
 import org.betonquest.betonquest.kernel.registry.TypeFactory;
+import org.betonquest.betonquest.quest.variable.location.LocationFormationMode;
 import org.betonquest.betonquest.util.BlockSelector;
 import org.bukkit.Location;
 
@@ -20,14 +21,16 @@ public class PlaceBlockStoreLocationObjectiveFactory implements TypeFactory<Obje
     @Override
     public Objective parseInstruction(final Instruction instruction) throws QuestException {
         final Variable<BlockSelector> selector = instruction.get(Argument.BLOCK_SELECTOR);
-        final boolean exactMatch = instruction.hasArgument("exactMatch");
-        final Variable<Location> location = instruction.getValue("loc", Argument.LOCATION);
-        final Variable<Location> region = instruction.getValue("region", Argument.LOCATION);
-        final boolean ignoreCancel = instruction.hasArgument("ignorecancel");
         final Variable<Map.Entry<ObjectiveID, String>> variable = instruction.getValue("variable", VariableParser.VARIABLE);
         if (variable == null) {
             throw new QuestException("A 'variable' is required");
         }
-        return new PlaceBlockStoreLocationObjective(instruction, selector, variable, exactMatch, location, region, ignoreCancel);
+        final Variable<LocationFormationMode> mode = instruction.getValue("mode",
+                LocationFormationMode::getMode, LocationFormationMode.ULF_SHORT);
+        final boolean exactMatch = instruction.hasArgument("exactMatch");
+        final Variable<Location> location = instruction.getValue("loc", Argument.LOCATION);
+        final Variable<Location> region = instruction.getValue("region", Argument.LOCATION);
+        final boolean ignoreCancel = instruction.hasArgument("ignorecancel");
+        return new PlaceBlockStoreLocationObjective(instruction, selector, mode, variable, exactMatch, location, region, ignoreCancel);
     }
 }

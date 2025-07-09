@@ -42,12 +42,15 @@ and it requires a `variable` where you define the
 [`variable` objective](https://betonquest.org/DEV/Documentation/Scripting/Building-Blocks/Objectives-List/#variable-variable)
 to store the location into.
 
+The format of the stored location can be set with the optional
+[`mode`](https://betonquest.org/DEV/Documentation/Scripting/Building-Blocks/Variables-List/#location-variable), and defaults to `ulfShort`.
+
 It has the optional parameters `loc` and `region`, with which you can define a region
 to place the block (similar to the `block` objective).
 
 Like with every `Objective` you can define `events:` and `conditions:`.
 
-#### Usage: `locStore DIAMOND_BLOCK variable:<VariableObjectiveID>#<Key> loc:<Corner1> region:<Corner2>`
+#### Usage: `locStore DIAMOND_BLOCK variable:<VariableObjectiveID>#<Key> loc:<Corner1> region:<Corner2> mode:<ulfMode>`
 
 ## Playtime
 

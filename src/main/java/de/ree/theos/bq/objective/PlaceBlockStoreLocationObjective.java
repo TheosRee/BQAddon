@@ -9,6 +9,7 @@ import org.betonquest.betonquest.id.ObjectiveID;
 import org.betonquest.betonquest.instruction.Instruction;
 import org.betonquest.betonquest.instruction.variable.Variable;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
+import org.betonquest.betonquest.quest.variable.location.LocationFormationMode;
 import org.betonquest.betonquest.util.BlockSelector;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,6 +39,11 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
     private final Variable<Map.Entry<ObjectiveID, String>> variable;
 
     /**
+     * Ulf mode to use for storing the location.
+     */
+    private final Variable<LocationFormationMode> mode;
+
+    /**
      * Optional exactMatch parameter.
      */
     private final boolean exactMatch;
@@ -59,6 +65,7 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
      *
      * @param instruction  the user provided instruction string
      * @param selector     the block selector to match placed block
+     * @param mode         the ulf mode to use for the stored location
      * @param variable     the variable to store the location into
      * @param exactMatch   the exact match flag
      * @param location     the location of the block
@@ -67,11 +74,12 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
      * @throws QuestException when the Instruction is invalid or the VariableObjective does not exist
      */
     public PlaceBlockStoreLocationObjective(final Instruction instruction, final Variable<BlockSelector> selector,
-            final Variable<Map.Entry<ObjectiveID, String>> variable, final boolean exactMatch,
+            final Variable<LocationFormationMode> mode, final Variable<Map.Entry<ObjectiveID, String>> variable, final boolean exactMatch,
             final @Nullable Variable<Location> location, final @Nullable Variable<Location> region, final boolean ignoreCancel
     ) throws QuestException {
         super(instruction);
         this.selector = selector;
+        this.mode = mode;
         this.exactMatch = exactMatch;
         this.location = location;
         this.region = region;
@@ -96,7 +104,7 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
                 final Map.Entry<ObjectiveID, String> variable = this.variable.getValue(onlineProfile);
                 if (BetonQuest.getInstance().getQuestTypeAPI()
                         .getObjective(variable.getKey()) instanceof VariableObjective variableObjective) {
-                    final String serialized = block.getX() + ";" + block.getY() + ";" + block.getZ() + ";" + block.getWorld().getName();
+                    final String serialized = mode.getValue(onlineProfile).getFormattedLocation(block.getLocation(), 0);
                     if (!variableObjective.store(onlineProfile, variable.getValue(), serialized)) {
                         throw new QuestException("Can't store value in variable objective '" + variable.getKey()
                                 + "' because it is not active for the player!");
