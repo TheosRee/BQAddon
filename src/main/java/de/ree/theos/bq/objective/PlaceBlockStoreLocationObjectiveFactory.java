@@ -11,6 +11,7 @@ import org.betonquest.betonquest.kernel.registry.TypeFactory;
 import org.betonquest.betonquest.quest.variable.location.LocationFormationMode;
 import org.betonquest.betonquest.util.BlockSelector;
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 import java.util.Map;
 
@@ -27,10 +28,12 @@ public class PlaceBlockStoreLocationObjectiveFactory implements TypeFactory<Obje
         }
         final Variable<LocationFormationMode> mode = instruction.getValue("mode",
                 LocationFormationMode::getMode, LocationFormationMode.ULF_SHORT);
+        final Variable<Vector> vector = instruction.getValue("vector", Argument.VECTOR);
         final boolean exactMatch = instruction.hasArgument("exactMatch");
         final Variable<Location> location = instruction.getValue("loc", Argument.LOCATION);
         final Variable<Location> region = instruction.getValue("region", Argument.LOCATION);
         final boolean ignoreCancel = instruction.hasArgument("ignorecancel");
-        return new PlaceBlockStoreLocationObjective(instruction, selector, mode, variable, exactMatch, location, region, ignoreCancel);
+        return new PlaceBlockStoreLocationObjective(instruction, selector, mode, variable, vector, exactMatch, location, region,
+                ignoreCancel);
     }
 }

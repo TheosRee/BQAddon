@@ -48,6 +48,8 @@ The format of the stored location can be set with the optional
 It has the optional parameters `loc` and `region`, with which you can define a region
 to place the block (similar to the `block` objective).
 
+The stored location can be offset with an optional `vector` (for example `vector:(1;2;3)`).
+
 Like with every `Objective` you can define `events:` and `conditions:`.
 
 #### Usage: `locStore DIAMOND_BLOCK variable:<VariableObjectiveID>#<Key> loc:<Corner1> region:<Corner2> mode:<ulfMode>`

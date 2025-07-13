@@ -19,6 +19,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -44,6 +45,12 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
     private final Variable<LocationFormationMode> mode;
 
     /**
+     * Vector to add to storing location.
+     */
+    @Nullable
+    private final Variable<Vector> vector;
+
+    /**
      * Optional exactMatch parameter.
      */
     private final boolean exactMatch;
@@ -67,6 +74,7 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
      * @param selector     the block selector to match placed block
      * @param mode         the ulf mode to use for the stored location
      * @param variable     the variable to store the location into
+     * @param vector       the vector to add to the location to store
      * @param exactMatch   the exact match flag
      * @param location     the location of the block
      * @param region       the second location defining a region
@@ -74,12 +82,14 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
      * @throws QuestException when the Instruction is invalid or the VariableObjective does not exist
      */
     public PlaceBlockStoreLocationObjective(final Instruction instruction, final Variable<BlockSelector> selector,
-            final Variable<LocationFormationMode> mode, final Variable<Map.Entry<ObjectiveID, String>> variable, final boolean exactMatch,
+            final Variable<LocationFormationMode> mode, final Variable<Map.Entry<ObjectiveID, String>> variable,
+            final @Nullable Variable<Vector> vector, final boolean exactMatch,
             final @Nullable Variable<Location> location, final @Nullable Variable<Location> region, final boolean ignoreCancel
     ) throws QuestException {
         super(instruction);
         this.selector = selector;
         this.mode = mode;
+        this.vector = vector;
         this.exactMatch = exactMatch;
         this.location = location;
         this.region = region;
@@ -97,14 +107,18 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
             final OnlineProfile onlineProfile = profileProvider.getProfile(event.getPlayer());
             final BlockSelector blockSelector = selector.getValue(onlineProfile);
             final Block block = event.getBlock();
+            final Location location = block.getLocation();
             if (containsPlayer(onlineProfile)
                     && blockSelector.match(block, exactMatch)
                     && checkConditions(onlineProfile)
-                    && checkLocation(block.getLocation(), onlineProfile)) {
+                    && checkLocation(location, onlineProfile)) {
                 final Map.Entry<ObjectiveID, String> variable = this.variable.getValue(onlineProfile);
                 if (BetonQuest.getInstance().getQuestTypeAPI()
                         .getObjective(variable.getKey()) instanceof VariableObjective variableObjective) {
-                    final String serialized = mode.getValue(onlineProfile).getFormattedLocation(block.getLocation(), 0);
+                    if (vector != null) {
+                        location.add(vector.getValue(onlineProfile));
+                    }
+                    final String serialized = mode.getValue(onlineProfile).getFormattedLocation(location, 0);
                     if (!variableObjective.store(onlineProfile, variable.getValue(), serialized)) {
                         throw new QuestException("Can't store value in variable objective '" + variable.getKey()
                                 + "' because it is not active for the player!");
