@@ -1,9 +1,9 @@
 package de.ree.theos.bq.playtime;
 
+import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition;
-import org.betonquest.betonquest.instruction.variable.Variable;
 import org.betonquest.betonquest.quest.event.folder.TimeUnit;
 import org.bukkit.Statistic;
 

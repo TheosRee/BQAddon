@@ -1,9 +1,9 @@
 package de.ree.theos.bq;
 
 import org.betonquest.betonquest.api.config.quest.QuestPackage;
+import org.betonquest.betonquest.api.instruction.argument.PackageArgument;
 import org.betonquest.betonquest.api.quest.QuestException;
-import org.betonquest.betonquest.id.ObjectiveID;
-import org.betonquest.betonquest.instruction.argument.PackageArgument;
+import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 
 import java.util.Map;
 

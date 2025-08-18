@@ -1,8 +1,8 @@
 package de.ree.theos.bq.item;
 
 import org.apache.logging.log4j.util.Strings;
+import org.betonquest.betonquest.api.instruction.argument.types.BooleanParser;
 import org.betonquest.betonquest.api.quest.QuestException;
-import org.betonquest.betonquest.instruction.argument.types.BooleanParser;
 import org.betonquest.betonquest.item.typehandler.Existence;
 import org.betonquest.betonquest.item.typehandler.ItemMetaHandler;
 import org.betonquest.betonquest.util.Utils;
@@ -115,6 +115,38 @@ public class UpdatedCustomModelDataHandler implements ItemMetaHandler<ItemMeta> 
         }
     }
 
+    @Override
+    public void populate(final ItemMeta meta) {
+        if (existence == Existence.REQUIRED) {
+            final CustomModelDataComponent cmd = meta.getCustomModelDataComponent();
+            cmd.setFloats(floats);
+            cmd.setFlags(flags);
+            cmd.setStrings(strings);
+            cmd.setColors(colors);
+            meta.setCustomModelDataComponent(cmd);
+        }
+        if (modelE == Existence.REQUIRED) {
+            meta.setItemModel(model);
+        }
+    }
+
+    @Override
+    public boolean check(final ItemMeta data) {
+        if (!(modelE == Existence.WHATEVER
+                || modelE == Existence.FORBIDDEN && !data.hasItemModel()
+                || modelE == Existence.REQUIRED && data.hasItemModel() && Objects.equals(model, data.getItemModel()))) {
+            return false;
+        }
+        return existence == Existence.WHATEVER
+                || existence == Existence.FORBIDDEN && !data.hasCustomModelData()
+                || existence == Existence.REQUIRED && data.hasCustomModelData() && check(data.getCustomModelDataComponent());
+    }
+
+    private boolean check(final CustomModelDataComponent cmd) {
+        return floats.equals(cmd.getFloats()) && flags.equals(cmd.getFlags()) && strings.equals(cmd.getStrings())
+                && colors.equals(cmd.getColors());
+    }
+
     @SuppressWarnings({"PMD.ImplicitSwitchFallThrough", "PMD.CyclomaticComplexity"})
     private void setCmd(final String data) throws QuestException {
         final String[] split = data.split(";", -1);
@@ -151,37 +183,5 @@ public class UpdatedCustomModelDataHandler implements ItemMetaHandler<ItemMeta> 
             default:
                 throw new QuestException("Invalid length: " + split.length);
         }
-    }
-
-    @Override
-    public void populate(final ItemMeta meta) {
-        if (existence == Existence.REQUIRED) {
-            final CustomModelDataComponent cmd = meta.getCustomModelDataComponent();
-            cmd.setFloats(floats);
-            cmd.setFlags(flags);
-            cmd.setStrings(strings);
-            cmd.setColors(colors);
-            meta.setCustomModelDataComponent(cmd);
-        }
-        if (modelE == Existence.REQUIRED) {
-            meta.setItemModel(model);
-        }
-    }
-
-    @Override
-    public boolean check(final ItemMeta data) {
-        if (!(modelE == Existence.WHATEVER
-                || modelE == Existence.FORBIDDEN && !data.hasItemModel()
-                || modelE == Existence.REQUIRED && data.hasItemModel() && Objects.equals(model, data.getItemModel()))) {
-            return false;
-        }
-        return existence == Existence.WHATEVER
-                || existence == Existence.FORBIDDEN && !data.hasCustomModelData()
-                || existence == Existence.REQUIRED && data.hasCustomModelData() && check(data.getCustomModelDataComponent());
-    }
-
-    private boolean check(final CustomModelDataComponent cmd) {
-        return floats.equals(cmd.getFloats()) && flags.equals(cmd.getFlags()) && strings.equals(cmd.getStrings())
-                && colors.equals(cmd.getColors());
     }
 }

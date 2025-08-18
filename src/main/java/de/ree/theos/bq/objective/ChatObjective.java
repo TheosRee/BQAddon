@@ -2,12 +2,12 @@ package de.ree.theos.bq.objective;
 
 import org.betonquest.betonquest.BetonQuest;
 import org.betonquest.betonquest.api.Objective;
+import org.betonquest.betonquest.api.instruction.Instruction;
+import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
-import org.betonquest.betonquest.id.ObjectiveID;
-import org.betonquest.betonquest.instruction.Instruction;
-import org.betonquest.betonquest.instruction.variable.Variable;
+import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -58,11 +58,6 @@ public class ChatObjective extends Objective implements Listener {
     }
 
     @Override
-    public String getDefaultDataInstruction() {
-        return "";
-    }
-
-    @Override
     public String getProperty(final String name, final Profile profile) {
         return "";
     }
@@ -86,19 +81,25 @@ public class ChatObjective extends Objective implements Listener {
         if (variable != null) {
             qeHandler.handle(() -> {
                 final Map.Entry<ObjectiveID, String> variable = this.variable.getValue(onlineProfile);
-                if (BetonQuest.getInstance().getQuestTypeAPI()
-                        .getObjective(variable.getKey()) instanceof VariableObjective variableObjective) {
+                final ObjectiveID id = variable.getKey();
+                if (BetonQuest.getInstance().getQuestTypeApi()
+                        .getObjective(id) instanceof VariableObjective variableObjective) {
                     if (!variableObjective.store(onlineProfile, variable.getValue(), event.getMessage())) {
-                        throw new QuestException("Can't store value in variable objective '" + variable.getKey().getFullID()
+                        throw new QuestException("Can't store value in variable objective '" + id
                                 + "' because it is not active for the player!");
                     }
                 } else {
-                    throw new QuestException("Can't store value in variable objective '" + variable.getKey().getFullID()
+                    throw new QuestException("Can't store value in variable objective '" + id
                             + "' because it is not an variable objective!");
                 }
             });
         }
 
         completeObjective(onlineProfile);
+    }
+
+    @Override
+    public String getDefaultDataInstruction() {
+        return "";
     }
 }

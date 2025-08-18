@@ -2,12 +2,12 @@ package de.ree.theos.bq.objective;
 
 import org.betonquest.betonquest.BetonQuest;
 import org.betonquest.betonquest.api.Objective;
+import org.betonquest.betonquest.api.instruction.Instruction;
+import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
-import org.betonquest.betonquest.id.ObjectiveID;
-import org.betonquest.betonquest.instruction.Instruction;
-import org.betonquest.betonquest.instruction.variable.Variable;
+import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
 import org.betonquest.betonquest.quest.variable.location.LocationFormationMode;
 import org.betonquest.betonquest.util.BlockSelector;
@@ -113,19 +113,20 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
                     && checkConditions(onlineProfile)
                     && checkLocation(location, onlineProfile)) {
                 final Map.Entry<ObjectiveID, String> variable = this.variable.getValue(onlineProfile);
-                if (BetonQuest.getInstance().getQuestTypeAPI()
-                        .getObjective(variable.getKey()) instanceof VariableObjective variableObjective) {
+                final ObjectiveID id = variable.getKey();
+                if (BetonQuest.getInstance().getQuestTypeApi()
+                        .getObjective(id) instanceof VariableObjective variableObjective) {
                     if (vector != null) {
                         location.add(vector.getValue(onlineProfile));
                     }
                     final String serialized = mode.getValue(onlineProfile).getFormattedLocation(location, 0);
                     if (!variableObjective.store(onlineProfile, variable.getValue(), serialized)) {
-                        throw new QuestException("Can't store value in variable objective '" + variable.getKey()
+                        throw new QuestException("Can't store value in variable objective '" + id
                                 + "' because it is not active for the player!");
                     }
                     completeObjective(onlineProfile);
                 } else {
-                    throw new QuestException("Can't store value in objective '" + variable.getKey()
+                    throw new QuestException("Can't store value in objective '" + id
                             + "' because it is not a variable objective!");
                 }
             }
