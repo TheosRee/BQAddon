@@ -14,7 +14,6 @@ import org.betonquest.betonquest.quest.event.folder.TimeUnit;
 import org.bukkit.Statistic;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.LinkedList;
@@ -43,15 +42,9 @@ public class PlaytimeObjective extends Objective {
     private final Variable<TimeUnit> timeUnit;
 
     /**
-     * The interval in ticks at which the objective checks if the time is up.
-     */
-    private final Variable<Number> interval;
-
-    /**
      * The runnable task that checks the progress.
      */
-    @Nullable
-    private BukkitTask runnable;
+    private final BukkitTask runnable;
 
     /**
      * Constructor for the DelayObjective.
@@ -70,12 +63,7 @@ public class PlaytimeObjective extends Objective {
         this.timePlayed = timePlayed;
         this.mode = mode;
         this.timeUnit = timeUnit;
-        this.interval = interval;
-    }
-
-    @Override
-    public void start() {
-        qeHandler.handle(() -> runnable = new BukkitRunnable() {
+        this.runnable = new BukkitRunnable() {
             @Override
             public void run() {
                 final List<Profile> players = new LinkedList<>();
@@ -93,14 +81,13 @@ public class PlaytimeObjective extends Objective {
                     completeObjective(profile);
                 }
             }
-        }.runTaskTimer(BetonQuest.getInstance(), 1, interval.getValue(null).longValue()));
+        }.runTaskTimer(BetonQuest.getInstance(), 1, interval.getValue(null).longValue());
     }
 
     @Override
-    public void stop() {
-        if (runnable != null) {
-            runnable.cancel();
-        }
+    public void close() {
+        runnable.cancel();
+        super.close();
     }
 
     @Override

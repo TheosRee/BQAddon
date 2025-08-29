@@ -9,9 +9,7 @@ import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jspecify.annotations.Nullable;
@@ -45,16 +43,6 @@ public class ChatObjective extends Objective implements Listener {
         super(instruction);
         this.cancel = cancel;
         this.variable = variable;
-    }
-
-    @Override
-    public void start() {
-        Bukkit.getPluginManager().registerEvents(this, BetonQuest.getInstance());
-    }
-
-    @Override
-    public void stop() {
-        HandlerList.unregisterAll(this);
     }
 
     @Override

@@ -11,12 +11,10 @@ import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
 import org.betonquest.betonquest.quest.variable.location.LocationFormationMode;
 import org.betonquest.betonquest.util.BlockSelector;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.util.Vector;
@@ -163,16 +161,6 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
 
     private boolean inWorld(final Location range1, final Location range2, final Location pos) {
         return range1.getWorld().equals(range2.getWorld()) && range2.getWorld().equals(pos.getWorld());
-    }
-
-    @Override
-    public void start() {
-        Bukkit.getPluginManager().registerEvents(this, BetonQuest.getInstance());
-    }
-
-    @Override
-    public void stop() {
-        HandlerList.unregisterAll(this);
     }
 
     @Override
