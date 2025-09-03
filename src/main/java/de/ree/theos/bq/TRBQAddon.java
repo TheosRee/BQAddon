@@ -32,7 +32,7 @@ public final class TRBQAddon extends JavaPlugin {
         questRegistries.variable().register("playtime", new PlaytimeVariableFactory());
 
         final ItemTypeRegistry item = betonQuest.getFeatureRegistries().item();
-        item.register("simple", new UpdatedSimpleItemFactory());
+        item.register("simple", new UpdatedSimpleItemFactory(betonQuest.getQuestPackageManager()));
         item.registerSerializer("simple", new UpdatedSimpleQuestItemSerializer());
     }
 }

@@ -1,6 +1,8 @@
 package de.ree.theos.bq.item;
 
+import org.betonquest.betonquest.api.config.quest.QuestPackageManager;
 import org.betonquest.betonquest.api.instruction.Instruction;
+import org.betonquest.betonquest.api.instruction.argument.Argument;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
 import org.betonquest.betonquest.item.QuestItem;
@@ -21,11 +23,18 @@ import java.util.Map;
  * Creates {@link SimpleQuestItem}s from {@link Instruction}s.
  */
 public class UpdatedSimpleItemFactory implements TypeFactory<QuestItemWrapper> {
+    /**
+     * The quest package manager to get quest packages from.
+     */
+    private final QuestPackageManager packManager;
 
     /**
      * Creates a new simple Quest Item Factory.
+     *
+     * @param packManager the quest package manager to get quest packages from
      */
-    public UpdatedSimpleItemFactory() {
+    public UpdatedSimpleItemFactory(final QuestPackageManager packManager) {
+        this.packManager = packManager;
     }
 
     private QuestItem parseInstruction(final String material, final List<String> arguments) throws QuestException {
@@ -56,7 +65,10 @@ public class UpdatedSimpleItemFactory implements TypeFactory<QuestItemWrapper> {
     }
 
     @Override
-    public QuestItemWrapper parseInstruction(final Instruction instruction) throws QuestException {
+    public QuestItemWrapper parseInstruction(final Instruction rawInstruction) throws QuestException {
+        final String instructionString = rawInstruction.get(rawInstruction.toString(), Argument.STRING).getValue(null);
+        final Instruction instruction = new Instruction(packManager, rawInstruction.getPackage(), rawInstruction.getID(),
+                instructionString);
         final String material = instruction.next();
         final List<String> arguments;
         if (instruction.hasNext()) {
