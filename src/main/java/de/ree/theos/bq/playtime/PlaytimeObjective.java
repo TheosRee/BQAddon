@@ -7,6 +7,7 @@ import org.betonquest.betonquest.BetonQuest;
 import org.betonquest.betonquest.api.Objective;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.instruction.variable.Variable;
+import org.betonquest.betonquest.api.logger.BetonQuestLogger;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
 import org.betonquest.betonquest.config.PluginMessage;
@@ -46,6 +47,8 @@ public class PlaytimeObjective extends Objective {
      */
     private final BukkitTask runnable;
 
+    private final BetonQuestLogger logger;
+
     /**
      * Constructor for the DelayObjective.
      *
@@ -63,23 +66,34 @@ public class PlaytimeObjective extends Objective {
         this.timePlayed = timePlayed;
         this.mode = mode;
         this.timeUnit = timeUnit;
+        this.logger = BetonQuest.getInstance().getLoggerFactory().create(getClass());
         this.runnable = new BukkitRunnable() {
             @Override
             public void run() {
+                logger.debug(instruction.getPackage(), instruction.getID() + " Running core loop..");
                 final List<Profile> players = new LinkedList<>();
                 for (final Entry<Profile, ObjectiveData> entry : dataMap.entrySet()) {
                     final Profile profile = entry.getKey();
+                    logger.debug(instruction.getPackage(), "  Checking profile " + profile);
                     final PlaytimeData playerData = (PlaytimeData) entry.getValue();
                     profile.getOnlineProfile().ifPresent(onlineProfile -> {
+                        logger.debug(instruction.getPackage(), "    Profile is online; Playtime: "
+                                + onlineProfile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME)
+                                + "; Saved Time: " + playerData.getPlaytime());
+                        logger.debug(instruction.getPackage(), "    Conditions are met: " + checkConditions(profile));
                         if (onlineProfile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME) >= playerData.getPlaytime()
                                 && checkConditions(profile)) {
+                            logger.debug(instruction.getPackage(), "    Time and conditions are met");
                             players.add(profile);
                         }
                     });
                 }
                 for (final Profile profile : players) {
+                    logger.debug(instruction.getPackage(), "  Completing for profile " + profile);
                     completeObjective(profile);
+                    logger.debug(instruction.getPackage(), "  Completed");
                 }
+                logger.debug(instruction.getPackage(), instruction.getID() + " Ending core loop..");
             }
         }.runTaskTimer(BetonQuest.getInstance(), 1, interval.getValue(null).longValue());
     }
