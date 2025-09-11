@@ -10,6 +10,9 @@ import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.logger.BetonQuestLogger;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
+import org.betonquest.betonquest.api.quest.objective.ObjectiveData;
+import org.betonquest.betonquest.api.quest.objective.ObjectiveDataFactory;
+import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 import org.betonquest.betonquest.config.PluginMessage;
 import org.betonquest.betonquest.quest.event.folder.TimeUnit;
 import org.bukkit.Statistic;
@@ -27,6 +30,11 @@ import java.util.Objects;
  * Player has to play specified amount of time.
  */
 public class PlaytimeObjective extends Objective {
+    /**
+     * The Factory for the Playtime Data.
+     */
+    private static final ObjectiveDataFactory PLAYTIME_FACTORY = PlaytimeData::new;
+
     /**
      * The required play time.
      */
@@ -62,7 +70,7 @@ public class PlaytimeObjective extends Objective {
     public PlaytimeObjective(final Instruction instruction, final Variable<Number> timePlayed, final Variable<CountingMode> mode,
             final Variable<TimeUnit> timeUnit,
             final Variable<Number> interval) throws QuestException {
-        super(instruction, PlaytimeData.class);
+        super(instruction, PLAYTIME_FACTORY);
         this.timePlayed = timePlayed;
         this.mode = mode;
         this.timeUnit = timeUnit;
@@ -195,7 +203,7 @@ public class PlaytimeObjective extends Objective {
          * @param profile     the profile associated with this objective
          * @param objID       the ID of the objective
          */
-        public PlaytimeData(final String instruction, final Profile profile, final String objID) {
+        public PlaytimeData(final String instruction, final Profile profile, final ObjectiveID objID) {
             super(instruction, profile, objID);
             timestamp = Long.parseLong(instruction);
         }

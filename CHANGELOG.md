@@ -1,1 +1,1 @@
-Add (again) variable support for simple QuestItems
+Update to BQ 3 DEV-398 changes.
