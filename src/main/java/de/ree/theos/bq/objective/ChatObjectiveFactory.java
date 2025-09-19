@@ -4,9 +4,9 @@ import de.ree.theos.bq.VariableParser;
 import org.betonquest.betonquest.api.Objective;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.instruction.variable.Variable;
+import org.betonquest.betonquest.api.kernel.TypeFactory;
 import org.betonquest.betonquest.api.quest.QuestException;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
-import org.betonquest.betonquest.kernel.registry.TypeFactory;
 
 import java.util.Map;
 

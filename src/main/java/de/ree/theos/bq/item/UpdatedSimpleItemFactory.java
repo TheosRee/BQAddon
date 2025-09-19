@@ -1,15 +1,17 @@
 package de.ree.theos.bq.item;
 
+import org.betonquest.betonquest.api.common.component.BookPageWrapper;
 import org.betonquest.betonquest.api.config.quest.QuestPackageManager;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.instruction.argument.Argument;
+import org.betonquest.betonquest.api.kernel.TypeFactory;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
+import org.betonquest.betonquest.api.text.TextParser;
 import org.betonquest.betonquest.item.QuestItem;
 import org.betonquest.betonquest.item.QuestItemWrapper;
 import org.betonquest.betonquest.item.SimpleQuestItem;
 import org.betonquest.betonquest.item.typehandler.*;
-import org.betonquest.betonquest.kernel.registry.TypeFactory;
 import org.betonquest.betonquest.util.BlockSelector;
 import org.betonquest.betonquest.util.Utils;
 import org.jetbrains.annotations.Nullable;
@@ -29,12 +31,27 @@ public class UpdatedSimpleItemFactory implements TypeFactory<QuestItemWrapper> {
     private final QuestPackageManager packManager;
 
     /**
+     * The text parser used to parse text.
+     */
+    private final TextParser textParser;
+
+    /**
+     * The book page wrapper used to split pages.
+     */
+    private final BookPageWrapper bookPageWrapper;
+
+    /**
      * Creates a new simple Quest Item Factory.
      *
-     * @param packManager the quest package manager to get quest packages from
+     * @param packManager     the quest package manager to get quest packages from
+     * @param textParser      the text parser used to parse text
+     * @param bookPageWrapper the book page wrapper used to split pages
      */
-    public UpdatedSimpleItemFactory(final QuestPackageManager packManager) {
+    public UpdatedSimpleItemFactory(final QuestPackageManager packManager, final TextParser textParser,
+            final BookPageWrapper bookPageWrapper) {
         this.packManager = packManager;
+        this.textParser = textParser;
+        this.bookPageWrapper = bookPageWrapper;
     }
 
     private QuestItem parseInstruction(final String material, final List<String> arguments) throws QuestException {
@@ -52,7 +69,7 @@ public class UpdatedSimpleItemFactory implements TypeFactory<QuestItemWrapper> {
                 lore,
                 new EnchantmentsHandler(),
                 new UpdatedPotionHandler(),
-                new BookHandler(),
+                new BookHandler(textParser, bookPageWrapper),
                 new HeadHandler(),
                 new ColorHandler(),
                 new FireworkHandler()
