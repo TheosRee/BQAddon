@@ -1,9 +1,11 @@
 package de.ree.theos.bq.item;
 
+import net.kyori.adventure.text.Component;
 import org.betonquest.betonquest.api.quest.QuestException;
+import org.betonquest.betonquest.api.text.TextParser;
 import org.betonquest.betonquest.item.typehandler.Existence;
+import org.betonquest.betonquest.item.typehandler.HandlerUtil;
 import org.betonquest.betonquest.item.typehandler.NameHandler;
-import org.bukkit.ChatColor;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,10 +17,15 @@ import java.util.Set;
 public class UpdatedNameHandler extends NameHandler {
 
     /**
+     * The text parser used to parse text.
+     */
+    private final TextParser textParser;
+
+    /**
      * The Item Display Name.
      */
     @Nullable
-    private String name;
+    private Component name;
 
     /**
      * The required existence.
@@ -29,7 +36,7 @@ public class UpdatedNameHandler extends NameHandler {
      * The Item Name.
      */
     @Nullable
-    private String itemName;
+    private Component itemName;
 
     /**
      * The required item name existence.
@@ -37,19 +44,13 @@ public class UpdatedNameHandler extends NameHandler {
     private Existence itemNameE = Existence.WHATEVER;
 
     /**
-     * The empty default Constructor.
-     */
-    public UpdatedNameHandler() {
-    }
-
-    /**
-     * Replaces all underscores with spaces, except for those that are escaped with a backslash.
+     * Creates an empty NameHandler with also an 'itemName'.
      *
-     * @param input The input string.
-     * @return The input string with all underscores replaced with spaces, except for those that are escaped with a backslash.
+     * @param textParser the text parser used to parse text
      */
-    protected static String replaceUnderscore(final String input) {
-        return input.replaceAll("(?<!\\\\)_", " ").replaceAll("\\\\_", "_");
+    public UpdatedNameHandler(final TextParser textParser) {
+        super(textParser);
+        this.textParser = textParser;
     }
 
     @Override
@@ -67,10 +68,10 @@ public class UpdatedNameHandler extends NameHandler {
     public String serializeToString(final ItemMeta meta) {
         String name = null;
         if (meta.hasDisplayName()) {
-            name = "name:" + meta.getDisplayName().replace(" ", "_");
+            name = HandlerUtil.toKeyValue("name", meta.displayName());
         }
         if (meta.hasItemName()) {
-            return (name == null ? "" : name + " ") + meta.getItemName().replace(" ", "_");
+            return (name == null ? "" : name + " ") + HandlerUtil.toKeyValue("item-name", meta.itemName());
         }
         return name;
     }
@@ -85,7 +86,7 @@ public class UpdatedNameHandler extends NameHandler {
                 if (Existence.NONE_KEY.equalsIgnoreCase(data)) {
                     existence = Existence.FORBIDDEN;
                 } else {
-                    this.name = ChatColor.translateAlternateColorCodes('&', replaceUnderscore(data));
+                    this.name = textParser.parse(data);
                     existence = Existence.REQUIRED;
                 }
             }
@@ -93,7 +94,7 @@ public class UpdatedNameHandler extends NameHandler {
                 if (Existence.NONE_KEY.equalsIgnoreCase(data)) {
                     itemNameE = Existence.FORBIDDEN;
                 } else {
-                    this.itemName = ChatColor.translateAlternateColorCodes('&', replaceUnderscore(data));
+                    this.itemName = textParser.parse(data);
                     itemNameE = Existence.REQUIRED;
                 }
             }
@@ -103,14 +104,14 @@ public class UpdatedNameHandler extends NameHandler {
 
     @Override
     public void populate(final ItemMeta meta) {
-        meta.setDisplayName(name);
-        meta.setItemName(itemName);
+        meta.displayName(name);
+        meta.itemName(itemName);
     }
 
     @Override
     public boolean check(final ItemMeta meta) {
-        final String displayName = meta.hasDisplayName() ? meta.getDisplayName() : null;
-        final String itemName = meta.hasItemName() ? meta.getItemName() : null;
+        final Component displayName = meta.hasDisplayName() ? meta.displayName() : null;
+        final Component itemName = meta.hasItemName() ? meta.itemName() : null;
         return switch (existence) {
             case WHATEVER -> true;
             case REQUIRED -> displayName != null && displayName.equals(this.name);
@@ -129,7 +130,7 @@ public class UpdatedNameHandler extends NameHandler {
      */
     @Override
     @Nullable
-    public String get() {
+    public Component get() {
         return name == null ? itemName : name;
     }
 }
