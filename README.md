@@ -92,3 +92,11 @@ It also has the `left` and `rawseconds` properties, similar to the `delay` objec
 ### Variable
 
 #### Usage: `%playtime%` or `%playtime.<unit>%`
+
+## Arm Swing
+
+Swings an Arm.
+
+The only argument is either `HAND` or `OFF_HAND`.
+
+#### Usage: `swingArm <hand>`

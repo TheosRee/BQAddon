@@ -1,5 +1,6 @@
 package de.ree.theos.bq;
 
+import de.ree.theos.bq.animation.SwingArmEventFactory;
 import de.ree.theos.bq.item.UpdatedSimpleItemFactory;
 import de.ree.theos.bq.item.UpdatedSimpleQuestItemSerializer;
 import de.ree.theos.bq.objective.ChatObjectiveFactory;
@@ -34,5 +35,7 @@ public final class TRBQAddon extends JavaPlugin {
         final BookPageWrapper bookPageWrapper = new BookPageWrapper(betonQuest.getFontRegistry(), 114, 14);
         item.register("simple", new UpdatedSimpleItemFactory(betonQuest.getQuestPackageManager(), textParser, bookPageWrapper));
         item.registerSerializer("simple", new UpdatedSimpleQuestItemSerializer(textParser, bookPageWrapper));
+
+        questRegistries.event().register("swingArm", new SwingArmEventFactory(betonQuest.getLoggerFactory()));
     }
 }
