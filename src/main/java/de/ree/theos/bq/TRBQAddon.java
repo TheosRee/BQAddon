@@ -1,6 +1,7 @@
 package de.ree.theos.bq;
 
 import de.ree.theos.bq.animation.SwingArmEventFactory;
+import de.ree.theos.bq.conversation.NewMenuConvIOFactory;
 import de.ree.theos.bq.item.UpdatedSimpleItemFactory;
 import de.ree.theos.bq.item.UpdatedSimpleQuestItemSerializer;
 import de.ree.theos.bq.objective.ChatObjectiveFactory;
@@ -37,5 +38,9 @@ public final class TRBQAddon extends JavaPlugin {
         item.registerSerializer("simple", new UpdatedSimpleQuestItemSerializer(textParser, bookPageWrapper));
 
         questRegistries.event().register("swingArm", new SwingArmEventFactory(betonQuest.getLoggerFactory()));
+
+        betonQuest.getFeatureRegistries().conversationIO()
+                .register("menu", new NewMenuConvIOFactory(this, textParser, betonQuest.getFontRegistry(),
+                        betonQuest.getPluginConfig(), betonQuest.getConversationColors()));
     }
 }

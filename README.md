@@ -16,6 +16,11 @@ which is "too new" for what BetonQuest supports.
 
 # Features
 
+## Menu Conv IO
+
+Uses 1.21.3 Paper API to be independent of ProtocolLib and Internal Changes.
+Also removes the sitting on the armor stand for it, instead he can't jump or walk with just vanilla attributes.
+
 ## Item
 
 The `simple` item is now allowed to use the new custom model data format and `item-name`.
