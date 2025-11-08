@@ -8,6 +8,7 @@ import org.betonquest.betonquest.api.kernel.TypeFactory;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.QuestException;
 import org.betonquest.betonquest.api.text.TextParser;
+import org.betonquest.betonquest.config.PluginMessage;
 import org.betonquest.betonquest.item.QuestItem;
 import org.betonquest.betonquest.item.QuestItemWrapper;
 import org.betonquest.betonquest.item.SimpleQuestItem;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Creates {@link SimpleQuestItem}s from {@link Instruction}s.
@@ -41,17 +43,24 @@ public class UpdatedSimpleItemFactory implements TypeFactory<QuestItemWrapper> {
     private final BookPageWrapper bookPageWrapper;
 
     /**
+     * Supplier for the PluginMessage.
+     */
+    private final Supplier<PluginMessage> questItemLoreSupplier;
+
+    /**
      * Creates a new simple Quest Item Factory.
      *
-     * @param packManager     the quest package manager to get quest packages from
-     * @param textParser      the text parser used to parse text
-     * @param bookPageWrapper the book page wrapper used to split pages
+     * @param packManager           the quest package manager to get quest packages from
+     * @param textParser            the text parser used to parse text
+     * @param bookPageWrapper       the book page wrapper used to split pages
+     * @param questItemLoreSupplier supplies the plugin message instance if the "quest item" lore line should be added
      */
     public UpdatedSimpleItemFactory(final QuestPackageManager packManager, final TextParser textParser,
-            final BookPageWrapper bookPageWrapper) {
+            final BookPageWrapper bookPageWrapper, final Supplier<PluginMessage> questItemLoreSupplier) {
         this.packManager = packManager;
         this.textParser = textParser;
         this.bookPageWrapper = bookPageWrapper;
+        this.questItemLoreSupplier = questItemLoreSupplier;
     }
 
     private QuestItem parseInstruction(final String material, final List<String> arguments) throws QuestException {
@@ -60,7 +69,9 @@ public class UpdatedSimpleItemFactory implements TypeFactory<QuestItemWrapper> {
         final NameHandler name = new UpdatedNameHandler(textParser);
         final LoreHandler lore = new LoreHandler(textParser);
 
+        final PluginMessage pluginMessage = questItemLoreSupplier.get();
         final List<ItemMetaHandler<?>> handlers = List.of(
+                new QuestHandler(pluginMessage == null ? QuestHandler.LoreConsumer.EMPTY : new QuestHandler.Lore(pluginMessage)),
                 new DurabilityHandler(),
                 new UpdatedCustomModelDataHandler(),
                 new UnbreakableHandler(),

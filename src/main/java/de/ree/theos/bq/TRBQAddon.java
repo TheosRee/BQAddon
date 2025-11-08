@@ -33,7 +33,8 @@ public final class TRBQAddon extends JavaPlugin {
         final ItemRegistry item = betonQuest.getFeatureRegistries().item();
         final TextParser textParser = betonQuest.getTextParser();
         final BookPageWrapper bookPageWrapper = new BookPageWrapper(betonQuest.getFontRegistry(), 114, 14);
-        item.register("simple", new UpdatedSimpleItemFactory(betonQuest.getQuestPackageManager(), textParser, bookPageWrapper));
+        item.register("simple", new UpdatedSimpleItemFactory(betonQuest.getQuestPackageManager(), textParser, bookPageWrapper,
+                () -> betonQuest.getPluginConfig().getBoolean("item.quest.lore") ? betonQuest.getPluginMessage() : null));
         item.registerSerializer("simple", new UpdatedSimpleQuestItemSerializer(textParser, bookPageWrapper));
 
         questRegistries.event().register("swingArm", new SwingArmEventFactory(betonQuest.getLoggerFactory()));
