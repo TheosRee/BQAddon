@@ -1,7 +1,7 @@
 ### This Addon is for Testing and Implementing new features for BetonQuest
 
 MC: 1.21.4+
-BQ: 3.0.0-DEV-444+
+BQ: 3.0.0-DEV-465+
 
 # Why?
 
@@ -15,6 +15,11 @@ don't have to care about consistency and can also use an API version
 which is "too new" for what BetonQuest supports.
 
 # Features
+
+## Menu Conv IO
+
+Uses 1.21.3 Paper API to be independent of third party plugins.
+Also removes the sitting on the armor stand for it, instead he can't jump or walk with just vanilla attributes.
 
 ## Item
 
