@@ -182,11 +182,6 @@ public class PlaytimeObjective extends Objective {
         return Objects.requireNonNull((PlaytimeData) dataMap.get(profile));
     }
 
-    @Override
-    public String getDefaultDataInstruction() {
-        return "";
-    }
-
     /**
      * Data class for the PlaytimeObjective.
      */

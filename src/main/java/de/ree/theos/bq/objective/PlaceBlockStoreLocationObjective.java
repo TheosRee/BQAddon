@@ -169,7 +169,7 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
     }
 
     @Override
-    public String getDefaultDataInstruction() {
+    public String getDefaultDataInstruction(final Profile profile) {
         return "";
     }
 }
