@@ -1,5 +1,6 @@
 package de.ree.theos.bq.objective;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import org.betonquest.betonquest.BetonQuest;
 import org.betonquest.betonquest.api.Objective;
 import org.betonquest.betonquest.api.instruction.Instruction;
@@ -11,7 +12,6 @@ import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
@@ -56,7 +56,7 @@ public class ChatObjective extends Objective implements Listener {
      * @param event the event to listen to
      */
     @EventHandler(ignoreCancelled = true)
-    public void onChat(final AsyncPlayerChatEvent event) {
+    public void onChat(final AsyncChatEvent event) {
         final OnlineProfile onlineProfile = profileProvider.getProfile(event.getPlayer());
         if (!containsPlayer(onlineProfile) || !checkConditions(onlineProfile)) {
             return;
@@ -72,7 +72,7 @@ public class ChatObjective extends Objective implements Listener {
                 final ObjectiveID id = variable.getKey();
                 if (BetonQuest.getInstance().getQuestTypeApi()
                         .getObjective(id) instanceof VariableObjective variableObjective) {
-                    if (!variableObjective.store(onlineProfile, variable.getValue(), event.getMessage())) {
+                    if (!variableObjective.store(onlineProfile, variable.getValue(), event.signedMessage().message())) {
                         throw new QuestException("Can't store value in variable objective '" + id
                                 + "' because it is not active for the player!");
                     }

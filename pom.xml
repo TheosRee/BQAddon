@@ -6,7 +6,7 @@
 
     <groupId>de.ree.theos</groupId>
     <artifactId>bq</artifactId>
-    <version>1.4.2</version>
+    <version>1.5.0</version>
     <packaging>jar</packaging>
 
     <name>TR-BQ-Addon</name>
