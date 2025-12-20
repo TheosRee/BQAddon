@@ -2,11 +2,11 @@ package de.ree.theos.bq.objective;
 
 import de.ree.theos.bq.VariableParser;
 import org.betonquest.betonquest.api.Objective;
+import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.instruction.argument.Argument;
 import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.kernel.TypeFactory;
-import org.betonquest.betonquest.api.quest.QuestException;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 import org.betonquest.betonquest.quest.variable.location.LocationFormationMode;
 import org.betonquest.betonquest.util.BlockSelector;

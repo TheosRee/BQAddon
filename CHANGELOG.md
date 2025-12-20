@@ -1,1 +1,1 @@
-Removed override for `simple` item type and `menu` conversation io because they are now native part of BetonQuest
+adapt to BQ 3.0.0-DEV-500
