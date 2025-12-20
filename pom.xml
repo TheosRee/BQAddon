@@ -6,7 +6,7 @@
 
     <groupId>de.ree.theos</groupId>
     <artifactId>bq</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
     <packaging>jar</packaging>
 
     <name>TR-BQ-Addon</name>
@@ -29,19 +29,6 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -57,12 +44,8 @@
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-        <repository>
             <id>betonquest-repo</id>
-            <url>https://nexus.betonquest.org/repository/betonquest/</url>
+            <url>https://repo.betonquest.org/betonquest/</url>
         </repository>
     </repositories>
 
