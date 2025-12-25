@@ -3,7 +3,7 @@ package de.ree.theos.bq;
 import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.config.quest.QuestPackage;
 import org.betonquest.betonquest.api.config.quest.QuestPackageManager;
-import org.betonquest.betonquest.api.instruction.argument.InstructionIdentifierArgument;
+import org.betonquest.betonquest.api.instruction.argument.InstructionArgumentParser;
 import org.betonquest.betonquest.api.quest.Variables;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Parses a string to an objective id and variable key.
  */
-public class VariableParser implements InstructionIdentifierArgument<Map.Entry<ObjectiveID, String>> {
+public class VariableParser implements InstructionArgumentParser<Map.Entry<ObjectiveID, String>> {
     /**
      * The default instance of {@link VariableParser}.
      */

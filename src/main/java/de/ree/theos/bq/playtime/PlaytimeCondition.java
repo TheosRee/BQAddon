@@ -30,4 +30,9 @@ public class PlaytimeCondition implements PlayerCondition {
         final long wantedTickTime = unit.getValue(profile).getTicks(amount.getValue(profile).longValue());
         return playedTickTime >= wantedTickTime;
     }
+
+    @Override
+    public boolean isPrimaryThreadEnforced() {
+        return true;
+    }
 }

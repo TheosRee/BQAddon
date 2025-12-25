@@ -17,7 +17,7 @@ public class ChatObjectiveFactory implements TypeFactory<Objective> {
     @Override
     public Objective parseInstruction(final Instruction instruction) throws QuestException {
         final boolean cancel = instruction.hasArgument("cancel");
-        final Variable<Map.Entry<ObjectiveID, String>> variable = instruction.getValue("variable", VariableParser.VARIABLE);
+        final Variable<Map.Entry<ObjectiveID, String>> variable = instruction.parse(VariableParser.VARIABLE).get("variable").orElse(null);
         return new ChatObjective(instruction, cancel, variable);
     }
 }

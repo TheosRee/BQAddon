@@ -2,38 +2,26 @@ package de.ree.theos.bq.playtime;
 
 import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.instruction.Instruction;
-import org.betonquest.betonquest.api.instruction.argument.Argument;
 import org.betonquest.betonquest.api.instruction.variable.Variable;
-import org.betonquest.betonquest.api.quest.PrimaryServerThreadData;
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition;
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory;
-import org.betonquest.betonquest.api.quest.condition.thread.PrimaryServerThreadPlayerCondition;
-import org.betonquest.betonquest.quest.condition.sneak.SneakCondition;
 import org.betonquest.betonquest.quest.event.folder.TimeUnit;
 
 /**
- * Factory for {@link SneakCondition}s.
+ * Factory for {@link PlaytimeCondition}s.
  */
 public class PlaytimeConditionFactory implements PlayerConditionFactory {
 
     /**
-     * Data used for condition check on the primary server thread.
-     */
-    private final PrimaryServerThreadData data;
-
-    /**
      * Create the playtime condition factory.
-     *
-     * @param data the data used for checking the condition on the main thread
      */
-    public PlaytimeConditionFactory(final PrimaryServerThreadData data) {
-        this.data = data;
+    public PlaytimeConditionFactory() {
     }
 
     @Override
     public PlayerCondition parsePlayer(final Instruction instruction) throws QuestException {
-        final Variable<Number> wantedTime = instruction.get(Argument.NUMBER_NOT_LESS_THAN_ONE);
-        final Variable<TimeUnit> unit = instruction.getValue("unit", Argument.ENUM(TimeUnit.class), TimeUnit.SECONDS);
-        return new PrimaryServerThreadPlayerCondition(new PlaytimeCondition(wantedTime, unit), data);
+        final Variable<Number> wantedTime = instruction.number().atLeast(1).get();
+        final Variable<TimeUnit> unit = instruction.enumeration(TimeUnit.class).get("unit", TimeUnit.SECONDS);
+        return new PlaytimeCondition(wantedTime, unit);
     }
 }

@@ -21,7 +21,7 @@ public final class TRBQAddon extends JavaPlugin {
         questRegistries.objective().register("chat", new ChatObjectiveFactory());
         questRegistries.objective().register("locStore", new PlaceBlockStoreLocationObjectiveFactory());
 
-        questRegistries.condition().register("playtime", new PlaytimeConditionFactory(betonQuest.getPrimaryServerThreadData()));
+        questRegistries.condition().register("playtime", new PlaytimeConditionFactory());
         questRegistries.objective().register("playtime", new PlaytimeObjectiveFactory());
         questRegistries.variable().register("playtime", new PlaytimeVariableFactory());
 
