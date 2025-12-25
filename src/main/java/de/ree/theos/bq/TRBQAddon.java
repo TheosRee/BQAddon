@@ -1,5 +1,6 @@
 package de.ree.theos.bq;
 
+import de.ree.theos.bq.animation.SwingArmEventFactory;
 import de.ree.theos.bq.objective.ChatObjectiveFactory;
 import de.ree.theos.bq.objective.PlaceBlockStoreLocationObjectiveFactory;
 import de.ree.theos.bq.playtime.PlaytimeConditionFactory;
@@ -23,5 +24,7 @@ public final class TRBQAddon extends JavaPlugin {
         questRegistries.condition().register("playtime", new PlaytimeConditionFactory(betonQuest.getPrimaryServerThreadData()));
         questRegistries.objective().register("playtime", new PlaytimeObjectiveFactory());
         questRegistries.variable().register("playtime", new PlaytimeVariableFactory());
+
+        questRegistries.event().register("swingArm", new SwingArmEventFactory(betonQuest.getLoggerFactory()));
     }
 }
