@@ -1,7 +1,7 @@
 package de.ree.theos.bq.animation;
 
 import org.betonquest.betonquest.api.QuestException;
-import org.betonquest.betonquest.api.instruction.variable.Variable;
+import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.quest.event.online.OnlineEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -13,14 +13,14 @@ public class SwingArmEvent implements OnlineEvent {
     /**
      * Hand to swing.
      */
-    private final Variable<EquipmentSlot> hand;
+    private final Argument<EquipmentSlot> hand;
 
     /**
      * Create a new Event.
      *
      * @param hand the hand to swing
      */
-    public SwingArmEvent(final Variable<EquipmentSlot> hand) {
+    public SwingArmEvent(final Argument<EquipmentSlot> hand) {
         this.hand = hand;
     }
 

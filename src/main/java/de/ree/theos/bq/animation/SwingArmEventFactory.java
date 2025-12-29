@@ -1,9 +1,9 @@
 package de.ree.theos.bq.animation;
 
 import org.betonquest.betonquest.api.QuestException;
+import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.instruction.argument.parser.EnumParser;
-import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory;
 import org.betonquest.betonquest.api.quest.event.PlayerEvent;
 import org.betonquest.betonquest.api.quest.event.PlayerEventFactory;
@@ -30,7 +30,7 @@ public class SwingArmEventFactory implements PlayerEventFactory {
 
     @Override
     public PlayerEvent parsePlayer(final Instruction instruction) throws QuestException {
-        final Variable<EquipmentSlot> hand = instruction.parse(HandParser.HAND).get();
+        final Argument<EquipmentSlot> hand = instruction.parse(HandParser.HAND).get();
         return new OnlineEventAdapter(new SwingArmEvent(hand), loggerFactory.create(SwingArmEvent.class), instruction.getPackage());
     }
 

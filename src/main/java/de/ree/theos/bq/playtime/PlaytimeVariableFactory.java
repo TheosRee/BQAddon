@@ -1,8 +1,8 @@
 package de.ree.theos.bq.playtime;
 
 import org.betonquest.betonquest.api.QuestException;
+import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.instruction.Instruction;
-import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.quest.variable.PlayerVariable;
 import org.betonquest.betonquest.api.quest.variable.PlayerVariableFactory;
 import org.betonquest.betonquest.api.quest.variable.online.OnlineVariableAdapter;
@@ -22,7 +22,7 @@ public class PlaytimeVariableFactory implements PlayerVariableFactory {
 
     @Override
     public PlayerVariable parsePlayer(final Instruction instruction) throws QuestException {
-        final Variable<TimeUnit> unit;
+        final Argument<TimeUnit> unit;
         if (instruction.hasNext()) {
             unit = instruction.enumeration(TimeUnit.class).get();
         } else {

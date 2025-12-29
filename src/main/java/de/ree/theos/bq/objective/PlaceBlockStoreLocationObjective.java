@@ -1,11 +1,11 @@
 package de.ree.theos.bq.objective;
 
 import org.betonquest.betonquest.BetonQuest;
-import org.betonquest.betonquest.api.Objective;
+import org.betonquest.betonquest.api.DefaultObjective;
 import org.betonquest.betonquest.api.QuestException;
+import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.instruction.type.BlockSelector;
-import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
@@ -25,28 +25,28 @@ import java.util.Map;
 /**
  * Requires to place a block and stores the location in a variable.
  */
-public class PlaceBlockStoreLocationObjective extends Objective implements Listener {
+public class PlaceBlockStoreLocationObjective extends DefaultObjective implements Listener {
 
     /**
      * Block Selector parameter.
      */
-    private final Variable<BlockSelector> selector;
+    private final Argument<BlockSelector> selector;
 
     /**
      * A {@link VariableObjective} and key where the chat message should be stored.
      */
-    private final Variable<Map.Entry<ObjectiveID, String>> variable;
+    private final Argument<Map.Entry<ObjectiveID, String>> variable;
 
     /**
      * Ulf mode to use for storing the location.
      */
-    private final Variable<LocationFormationMode> mode;
+    private final Argument<LocationFormationMode> mode;
 
     /**
      * Vector to add to storing location.
      */
     @Nullable
-    private final Variable<Vector> vector;
+    private final Argument<Vector> vector;
 
     /**
      * Optional exactMatch parameter.
@@ -57,13 +57,13 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
      * Optional location parameter.
      */
     @Nullable
-    private final Variable<Location> location;
+    private final Argument<Location> location;
 
     /**
      * Optional region parameter. Used together with {@link #location} to form a cuboid region.
      */
     @Nullable
-    private final Variable<Location> region;
+    private final Argument<Location> region;
 
     /**
      * Create a new Objective.
@@ -79,10 +79,10 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
      * @param ignoreCancel the ignore cancel flag
      * @throws QuestException when the Instruction is invalid or the VariableObjective does not exist
      */
-    public PlaceBlockStoreLocationObjective(final Instruction instruction, final Variable<BlockSelector> selector,
-            final Variable<LocationFormationMode> mode, final Variable<Map.Entry<ObjectiveID, String>> variable,
-            final @Nullable Variable<Vector> vector, final boolean exactMatch,
-            final @Nullable Variable<Location> location, final @Nullable Variable<Location> region, final boolean ignoreCancel
+    public PlaceBlockStoreLocationObjective(final Instruction instruction, final Argument<BlockSelector> selector,
+            final Argument<LocationFormationMode> mode, final Argument<Map.Entry<ObjectiveID, String>> variable,
+            final @Nullable Argument<Vector> vector, final boolean exactMatch,
+            final @Nullable Argument<Location> location, final @Nullable Argument<Location> region, final boolean ignoreCancel
     ) throws QuestException {
         super(instruction);
         this.selector = selector;
@@ -141,7 +141,7 @@ public class PlaceBlockStoreLocationObjective extends Objective implements Liste
         return true;
     }
 
-    private boolean isInRange(final Location loc, final Profile profile, final Variable<Location> location, final Variable<Location> region)
+    private boolean isInRange(final Location loc, final Profile profile, final Argument<Location> location, final Argument<Location> region)
             throws QuestException {
         final Location loc1 = location.getValue(profile);
         final Location loc2 = region.getValue(profile);

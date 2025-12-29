@@ -1,7 +1,7 @@
 package de.ree.theos.bq.playtime;
 
 import org.betonquest.betonquest.api.QuestException;
-import org.betonquest.betonquest.api.instruction.variable.Variable;
+import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.quest.variable.online.OnlineVariable;
 import org.betonquest.betonquest.quest.event.folder.TimeUnit;
@@ -15,14 +15,14 @@ public class PlaytimeVariable implements OnlineVariable {
     /**
      * The unit to convert playtime to.
      */
-    private final Variable<TimeUnit> unit;
+    private final Argument<TimeUnit> unit;
 
     /**
      * Create a new playtime variable.
      *
      * @param unit the unit to display
      */
-    public PlaytimeVariable(final Variable<TimeUnit> unit) {
+    public PlaytimeVariable(final Argument<TimeUnit> unit) {
         this.unit = unit;
     }
 

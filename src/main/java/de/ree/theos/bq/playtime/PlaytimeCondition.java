@@ -1,7 +1,7 @@
 package de.ree.theos.bq.playtime;
 
 import org.betonquest.betonquest.api.QuestException;
-import org.betonquest.betonquest.api.instruction.variable.Variable;
+import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition;
 import org.betonquest.betonquest.quest.event.folder.TimeUnit;
@@ -12,14 +12,14 @@ import org.bukkit.Statistic;
  */
 public class PlaytimeCondition implements PlayerCondition {
 
-    private final Variable<Number> amount;
+    private final Argument<Number> amount;
 
-    private final Variable<TimeUnit> unit;
+    private final Argument<TimeUnit> unit;
 
     /**
      * Create the playtime condition.
      */
-    public PlaytimeCondition(final Variable<Number> amount, final Variable<TimeUnit> unit) {
+    public PlaytimeCondition(final Argument<Number> amount, final Argument<TimeUnit> unit) {
         this.amount = amount;
         this.unit = unit;
     }

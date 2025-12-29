@@ -4,10 +4,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.betonquest.betonquest.BetonQuest;
-import org.betonquest.betonquest.api.Objective;
+import org.betonquest.betonquest.api.DefaultObjective;
 import org.betonquest.betonquest.api.QuestException;
+import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.instruction.Instruction;
-import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.logger.BetonQuestLogger;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveData;
@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * Player has to play specified amount of time.
  */
-public class PlaytimeObjective extends Objective {
+public class PlaytimeObjective extends DefaultObjective {
     /**
      * The Factory for the Playtime Data.
      */
@@ -38,17 +38,17 @@ public class PlaytimeObjective extends Objective {
     /**
      * The required play time.
      */
-    private final Variable<Number> timePlayed;
+    private final Argument<Number> timePlayed;
 
     /**
      * Starting mode to eventually offset from the already present value at objective start.
      */
-    private final Variable<CountingMode> mode;
+    private final Argument<CountingMode> mode;
 
     /**
      * The time unit used for starting the objective.
      */
-    private final Variable<TimeUnit> timeUnit;
+    private final Argument<TimeUnit> timeUnit;
 
     /**
      * The runnable task that checks the progress.
@@ -67,9 +67,9 @@ public class PlaytimeObjective extends Objective {
      * @param timePlayed  the time in
      * @throws QuestException if there is an error in the instruction
      */
-    public PlaytimeObjective(final Instruction instruction, final Variable<Number> timePlayed, final Variable<CountingMode> mode,
-            final Variable<TimeUnit> timeUnit,
-            final Variable<Number> interval) throws QuestException {
+    public PlaytimeObjective(final Instruction instruction, final Argument<Number> timePlayed, final Argument<CountingMode> mode,
+            final Argument<TimeUnit> timeUnit,
+            final Argument<Number> interval) throws QuestException {
         super(instruction, PLAYTIME_FACTORY);
         this.timePlayed = timePlayed;
         this.mode = mode;

@@ -2,10 +2,10 @@ package de.ree.theos.bq.objective;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.betonquest.betonquest.BetonQuest;
-import org.betonquest.betonquest.api.Objective;
+import org.betonquest.betonquest.api.DefaultObjective;
 import org.betonquest.betonquest.api.QuestException;
+import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.instruction.Instruction;
-import org.betonquest.betonquest.api.instruction.variable.Variable;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Catches the next chat message of a player.
  */
-public class ChatObjective extends Objective implements Listener {
+public class ChatObjective extends DefaultObjective implements Listener {
 
     /**
      * If the chat event should be cancelled.
@@ -30,7 +30,7 @@ public class ChatObjective extends Objective implements Listener {
      * A {@link VariableObjective} and key where the chat message should be stored.
      */
     @Nullable
-    private final Variable<Map.Entry<ObjectiveID, String>> variable;
+    private final Argument<Map.Entry<ObjectiveID, String>> variable;
 
     /**
      * Create a new Chat Objective from an Instruction string.
@@ -39,7 +39,7 @@ public class ChatObjective extends Objective implements Listener {
      * @throws QuestException when the Instruction is invalid or the VariableObjective does not exist
      */
     public ChatObjective(final Instruction instruction, final boolean cancel,
-            @Nullable final Variable<Map.Entry<ObjectiveID, String>> variable) throws QuestException {
+            @Nullable final Argument<Map.Entry<ObjectiveID, String>> variable) throws QuestException {
         super(instruction);
         this.cancel = cancel;
         this.variable = variable;
