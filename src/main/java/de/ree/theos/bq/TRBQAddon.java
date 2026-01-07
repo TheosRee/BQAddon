@@ -23,8 +23,8 @@ public final class TRBQAddon extends JavaPlugin {
 
         questRegistries.condition().register("playtime", new PlaytimeConditionFactory());
         questRegistries.objective().register("playtime", new PlaytimeObjectiveFactory());
-        questRegistries.variable().register("playtime", new PlaytimeVariableFactory());
+        questRegistries.placeholder().register("playtime", new PlaytimeVariableFactory());
 
-        questRegistries.event().register("swingArm", new SwingArmEventFactory(betonQuest.getLoggerFactory()));
+        questRegistries.action().register("swingArm", new SwingArmEventFactory(betonQuest.getLoggerFactory()));
     }
 }

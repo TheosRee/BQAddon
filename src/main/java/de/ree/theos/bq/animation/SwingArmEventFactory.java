@@ -5,15 +5,15 @@ import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.instruction.argument.parser.EnumParser;
 import org.betonquest.betonquest.api.logger.BetonQuestLoggerFactory;
-import org.betonquest.betonquest.api.quest.event.PlayerEvent;
-import org.betonquest.betonquest.api.quest.event.PlayerEventFactory;
-import org.betonquest.betonquest.api.quest.event.online.OnlineEventAdapter;
+import org.betonquest.betonquest.api.quest.action.PlayerAction;
+import org.betonquest.betonquest.api.quest.action.PlayerActionFactory;
+import org.betonquest.betonquest.api.quest.action.online.OnlineActionAdapter;
 import org.bukkit.inventory.EquipmentSlot;
 
 /**
  * Factory to create {@link SwingArmEvent}s from {@link Instruction}s.
  */
-public class SwingArmEventFactory implements PlayerEventFactory {
+public class SwingArmEventFactory implements PlayerActionFactory {
     /**
      * Logger factory to create new class specific logger.
      */
@@ -29,9 +29,9 @@ public class SwingArmEventFactory implements PlayerEventFactory {
     }
 
     @Override
-    public PlayerEvent parsePlayer(final Instruction instruction) throws QuestException {
+    public PlayerAction parsePlayer(final Instruction instruction) throws QuestException {
         final Argument<EquipmentSlot> hand = instruction.parse(HandParser.HAND).get();
-        return new OnlineEventAdapter(new SwingArmEvent(hand), loggerFactory.create(SwingArmEvent.class), instruction.getPackage());
+        return new OnlineActionAdapter(new SwingArmEvent(hand), loggerFactory.create(SwingArmEvent.class), instruction.getPackage());
     }
 
     /**

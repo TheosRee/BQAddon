@@ -3,13 +3,13 @@ package de.ree.theos.bq.animation;
 import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
-import org.betonquest.betonquest.api.quest.event.online.OnlineEvent;
+import org.betonquest.betonquest.api.quest.action.online.OnlineAction;
 import org.bukkit.inventory.EquipmentSlot;
 
 /**
  * Event to swing an arm of a player.
  */
-public class SwingArmEvent implements OnlineEvent {
+public class SwingArmEvent implements OnlineAction {
     /**
      * Hand to swing.
      */

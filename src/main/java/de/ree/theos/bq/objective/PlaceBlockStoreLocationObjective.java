@@ -10,7 +10,7 @@ import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
-import org.betonquest.betonquest.quest.variable.location.LocationFormationMode;
+import org.betonquest.betonquest.quest.placeholder.location.LocationFormationMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;

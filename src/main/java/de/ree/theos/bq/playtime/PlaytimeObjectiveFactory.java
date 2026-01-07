@@ -5,7 +5,8 @@ import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveFactory;
-import org.betonquest.betonquest.quest.event.folder.TimeUnit;
+import org.betonquest.betonquest.api.quest.objective.event.ObjectiveFactoryService;
+import org.betonquest.betonquest.quest.action.folder.TimeUnit;
 
 /**
  * Factory for creating {@link PlaytimeObjective}s from {@link Instruction}s.
@@ -19,7 +20,8 @@ public class PlaytimeObjectiveFactory implements ObjectiveFactory {
     }
 
     @Override
-    public DefaultObjective parseInstruction(final Instruction instruction) throws QuestException {
+    public DefaultObjective parseInstruction(final Instruction instruction, final ObjectiveFactoryService eventService)
+            throws QuestException {
         final Argument<Number> playtime = instruction.number().atLeast(0).get();
         final Argument<CountingMode> mode = instruction.enumeration(CountingMode.class).get();
         final Argument<Number> interval = instruction.number().atLeast(1).get("interval", 1200);

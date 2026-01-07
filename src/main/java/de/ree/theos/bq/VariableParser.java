@@ -4,7 +4,7 @@ import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.config.quest.QuestPackage;
 import org.betonquest.betonquest.api.config.quest.QuestPackageManager;
 import org.betonquest.betonquest.api.instruction.argument.InstructionArgumentParser;
-import org.betonquest.betonquest.api.quest.Variables;
+import org.betonquest.betonquest.api.quest.Placeholders;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
 
 import java.util.Map;
@@ -19,14 +19,14 @@ public class VariableParser implements InstructionArgumentParser<Map.Entry<Objec
     public static final VariableParser VARIABLE = new VariableParser();
 
     @Override
-    public Map.Entry<ObjectiveID, String> apply(final Variables variables, final QuestPackageManager questPackageManager,
+    public Map.Entry<ObjectiveID, String> apply(final Placeholders placeholders, final QuestPackageManager questPackageManager,
             final QuestPackage questPackage,
             final String string) throws QuestException {
         final String[] split = string.split("#");
         if (split.length != 2) {
             throw new QuestException("Invalid variable '" + string + "' does not contain ID and Key!");
         }
-        final ObjectiveID ObjectiveID = new ObjectiveID(variables, questPackageManager, questPackage, split[0]);
+        final ObjectiveID ObjectiveID = new ObjectiveID(placeholders, questPackageManager, questPackage, split[0]);
         return Map.entry(ObjectiveID, split[1]);
     }
 }

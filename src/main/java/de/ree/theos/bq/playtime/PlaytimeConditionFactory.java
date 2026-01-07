@@ -5,7 +5,7 @@ import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition;
 import org.betonquest.betonquest.api.quest.condition.PlayerConditionFactory;
-import org.betonquest.betonquest.quest.event.folder.TimeUnit;
+import org.betonquest.betonquest.quest.action.folder.TimeUnit;
 
 /**
  * Factory for {@link PlaytimeCondition}s.
