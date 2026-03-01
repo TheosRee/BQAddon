@@ -6,13 +6,13 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.betonquest.betonquest.BetonQuest;
 import org.betonquest.betonquest.api.DefaultObjective;
 import org.betonquest.betonquest.api.QuestException;
+import org.betonquest.betonquest.api.common.function.QuestFunction;
+import org.betonquest.betonquest.api.identifier.ObjectiveIdentifier;
 import org.betonquest.betonquest.api.instruction.Argument;
-import org.betonquest.betonquest.api.instruction.Instruction;
-import org.betonquest.betonquest.api.logger.BetonQuestLogger;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.objective.ObjectiveData;
-import org.betonquest.betonquest.api.quest.objective.ObjectiveDataFactory;
-import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
+import org.betonquest.betonquest.api.quest.objective.service.ObjectiveProperties;
+import org.betonquest.betonquest.api.quest.objective.service.ObjectiveService;
 import org.betonquest.betonquest.config.PluginMessage;
 import org.betonquest.betonquest.quest.action.folder.TimeUnit;
 import org.bukkit.Statistic;
@@ -24,16 +24,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 /**
  * Player has to play specified amount of time.
  */
 public class PlaytimeObjective extends DefaultObjective {
-    /**
-     * The Factory for the Playtime Data.
-     */
-    private static final ObjectiveDataFactory PLAYTIME_FACTORY = PlaytimeData::new;
 
     /**
      * The required play time.
@@ -55,55 +50,63 @@ public class PlaytimeObjective extends DefaultObjective {
      */
     private final BukkitTask runnable;
 
-    private final BetonQuestLogger logger;
-
     /**
      * Constructor for the DelayObjective.
      *
-     * @param instruction the instruction that created this objective
-     * @param mode        the starting mode to eventually offset from the already present value at start
-     * @param timeUnit    the unit of time the player has to play
-     * @param interval    the interval in ticks at which the objective checks if the time played
-     * @param timePlayed  the time in
+     * @param service    the {@link ObjectiveService} for this objective
+     * @param mode       the starting mode to eventually offset from the already present value at start
+     * @param timeUnit   the unit of time the player has to play
+     * @param interval   the interval in ticks at which the objective checks if the time played
+     * @param timePlayed the time in
      * @throws QuestException if there is an error in the instruction
      */
-    public PlaytimeObjective(final Instruction instruction, final Argument<Number> timePlayed, final Argument<CountingMode> mode,
+    public PlaytimeObjective(final ObjectiveService service, final Argument<Number> timePlayed, final Argument<CountingMode> mode,
             final Argument<TimeUnit> timeUnit,
             final Argument<Number> interval) throws QuestException {
-        super(instruction, PLAYTIME_FACTORY);
+        super(service);
         this.timePlayed = timePlayed;
         this.mode = mode;
         this.timeUnit = timeUnit;
-        this.logger = BetonQuest.getInstance().getLoggerFactory().create(getClass());
         this.runnable = new BukkitRunnable() {
             @Override
             public void run() {
-                logger.debug(instruction.getPackage(), instruction.getID() + " Running core loop..");
                 final List<Profile> players = new LinkedList<>();
-                for (final Entry<Profile, ObjectiveData> entry : dataMap.entrySet()) {
+                final ObjectiveService service = getService();
+                for (final Entry<Profile, String> entry : service.getData().entrySet()) {
                     final Profile profile = entry.getKey();
-                    logger.debug(instruction.getPackage(), "  Checking profile " + profile);
-                    final PlaytimeData playerData = (PlaytimeData) entry.getValue();
+                    final PlaytimeData playerData = new PlaytimeData(entry.getValue(), profile, getObjectiveID());
                     profile.getOnlineProfile().ifPresent(onlineProfile -> {
-                        logger.debug(instruction.getPackage(), "    Profile is online; Playtime: "
-                                + onlineProfile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME)
-                                + "; Saved Time: " + playerData.getPlaytime());
-                        logger.debug(instruction.getPackage(), "    Conditions are met: " + checkConditions(profile));
-                        if (onlineProfile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME) >= playerData.getPlaytime()
-                                && checkConditions(profile)) {
-                            logger.debug(instruction.getPackage(), "    Time and conditions are met");
-                            players.add(profile);
+                        if (onlineProfile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME) >= playerData.getPlaytime()) {
+                            service.getExceptionHandler().handle(() -> {
+                                if (service.checkConditions(profile)) {
+                                    players.add(profile);
+                                }
+                            });
                         }
                     });
                 }
                 for (final Profile profile : players) {
-                    logger.debug(instruction.getPackage(), "  Completing for profile " + profile);
-                    completeObjective(profile);
-                    logger.debug(instruction.getPackage(), "  Completed");
+                    service.complete(profile);
                 }
-                logger.debug(instruction.getPackage(), instruction.getID() + " Ending core loop..");
             }
         }.runTaskTimer(BetonQuest.getInstance(), 1, interval.getValue(null).longValue());
+        service.setDefaultData(this::getDefaultDataInstruction);
+        service.getProperties().setParentProperties(new ObjectiveProperties() {
+            @Override
+            public String getProperty(final String name, final Profile profile) throws QuestException {
+                return PlaytimeObjective.this.getProperty(name, profile);
+            }
+
+            @Override
+            public void setProperty(final String name, final QuestFunction<Profile, String> property) {
+                throw new UnsupportedOperationException("Cannot set property for PlaytimeObjective");
+            }
+
+            @Override
+            public void setParentProperties(final ObjectiveProperties properties) {
+                throw new UnsupportedOperationException("Cannot set parent properties for PlaytimeObjective");
+            }
+        });
     }
 
     @Override
@@ -112,21 +115,17 @@ public class PlaytimeObjective extends DefaultObjective {
         super.close();
     }
 
-    @Override
-    public String getDefaultDataInstruction(final Profile profile) {
-        return qeHandler.handle(() -> {
-            final long targetValue = timeUnit.getValue(profile).getTicks(timePlayed.getValue(profile).longValue());
-            return switch (mode.getValue(profile)) {
-                case TOTAL -> String.valueOf(targetValue);
-                case RELATIVE -> String.valueOf(targetValue + profile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME));
-            };
-        }, "");
+    private String getDefaultDataInstruction(final Profile profile) throws QuestException {
+        final long targetValue = timeUnit.getValue(profile).getTicks(timePlayed.getValue(profile).longValue());
+        return switch (mode.getValue(profile)) {
+            case TOTAL -> String.valueOf(targetValue);
+            case RELATIVE -> String.valueOf(targetValue + profile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME));
+        };
     }
 
-    @Override
-    public String getProperty(final String name, final Profile profile) {
+    private String getProperty(final String name, final Profile profile) throws QuestException {
         return switch (name.toLowerCase(Locale.ROOT)) {
-            case "left" -> qeHandler.handle(() -> LegacyComponentSerializer.legacySection().serialize(parseVariableLeft(profile)), "");
+            case "left" -> LegacyComponentSerializer.legacySection().serialize(parseVariableLeft(profile));
             case "rawseconds" -> String.valueOf(secondsLeft(profile));
             default -> "";
         };
@@ -175,11 +174,10 @@ public class PlaytimeObjective extends DefaultObjective {
 
     /**
      * Get the delay data for a profile.
-     *
-     * @throws NullPointerException when {@link #containsPlayer(Profile)} is false
      */
     private PlaytimeData getPlaytimeData(final Profile profile) {
-        return Objects.requireNonNull((PlaytimeData) dataMap.get(profile));
+        final String data = getService().getData().get(profile);
+        return new PlaytimeData(data, profile, getObjectiveID());
     }
 
     /**
@@ -198,7 +196,7 @@ public class PlaytimeObjective extends DefaultObjective {
          * @param profile     the profile associated with this objective
          * @param objID       the ID of the objective
          */
-        public PlaytimeData(final String instruction, final Profile profile, final ObjectiveID objID) {
+        public PlaytimeData(final String instruction, final Profile profile, final ObjectiveIdentifier objID) {
             super(instruction, profile, objID);
             timestamp = Long.parseLong(instruction);
         }

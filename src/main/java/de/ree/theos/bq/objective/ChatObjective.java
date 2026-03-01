@@ -1,17 +1,14 @@
 package de.ree.theos.bq.objective;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
-import org.betonquest.betonquest.BetonQuest;
 import org.betonquest.betonquest.api.DefaultObjective;
 import org.betonquest.betonquest.api.QuestException;
+import org.betonquest.betonquest.api.identifier.ObjectiveIdentifier;
 import org.betonquest.betonquest.api.instruction.Argument;
-import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
-import org.betonquest.betonquest.api.profile.Profile;
-import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
+import org.betonquest.betonquest.api.quest.objective.service.ObjectiveService;
+import org.betonquest.betonquest.api.service.objective.ObjectiveManager;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
@@ -19,7 +16,12 @@ import java.util.Map;
 /**
  * Catches the next chat message of a player.
  */
-public class ChatObjective extends DefaultObjective implements Listener {
+public class ChatObjective extends DefaultObjective {
+
+    /**
+     * Objective manager to get requested objective.
+     */
+    private final ObjectiveManager objectiveManager;
 
     /**
      * If the chat event should be cancelled.
@@ -30,24 +32,20 @@ public class ChatObjective extends DefaultObjective implements Listener {
      * A {@link VariableObjective} and key where the chat message should be stored.
      */
     @Nullable
-    private final Argument<Map.Entry<ObjectiveID, String>> variable;
+    private final Argument<Map.Entry<ObjectiveIdentifier, String>> variable;
 
     /**
      * Create a new Chat Objective from an Instruction string.
      *
-     * @param instruction the user provided instruction string
-     * @throws QuestException when the Instruction is invalid or the VariableObjective does not exist
+     * @param service the {@link ObjectiveService} for this objective
+     * @param manager manager to get requested objective
      */
-    public ChatObjective(final Instruction instruction, final boolean cancel,
-            @Nullable final Argument<Map.Entry<ObjectiveID, String>> variable) throws QuestException {
-        super(instruction);
+    public ChatObjective(final ObjectiveService service, final ObjectiveManager manager, final boolean cancel,
+            @Nullable final Argument<Map.Entry<ObjectiveIdentifier, String>> variable) {
+        super(service);
+        this.objectiveManager = manager;
         this.cancel = cancel;
         this.variable = variable;
-    }
-
-    @Override
-    public String getProperty(final String name, final Profile profile) {
-        return "";
     }
 
     /**
@@ -55,39 +53,26 @@ public class ChatObjective extends DefaultObjective implements Listener {
      *
      * @param event the event to listen to
      */
-    @EventHandler(ignoreCancelled = true)
-    public void onChat(final AsyncChatEvent event) {
-        final OnlineProfile onlineProfile = profileProvider.getProfile(event.getPlayer());
-        if (!containsPlayer(onlineProfile) || !checkConditions(onlineProfile)) {
-            return;
-        }
+    public void onChat(final AsyncChatEvent event, final OnlineProfile profile) throws QuestException {
 
         if (cancel) {
             event.setCancelled(true);
         }
 
         if (variable != null) {
-            qeHandler.handle(() -> {
-                final Map.Entry<ObjectiveID, String> variable = this.variable.getValue(onlineProfile);
-                final ObjectiveID id = variable.getKey();
-                if (BetonQuest.getInstance().getQuestTypeApi()
-                        .getObjective(id) instanceof VariableObjective variableObjective) {
-                    if (!variableObjective.store(onlineProfile, variable.getValue(), event.signedMessage().message())) {
-                        throw new QuestException("Can't store value in variable objective '" + id
-                                + "' because it is not active for the player!");
-                    }
-                } else {
+            final Map.Entry<ObjectiveIdentifier, String> variable = this.variable.getValue(profile);
+            final ObjectiveIdentifier id = variable.getKey();
+            if (objectiveManager.getObjective(id) instanceof VariableObjective variableObjective) {
+                if (!variableObjective.store(profile, variable.getValue(), event.signedMessage().message())) {
                     throw new QuestException("Can't store value in variable objective '" + id
-                            + "' because it is not an variable objective!");
+                            + "' because it is not active for the player!");
                 }
-            });
+            } else {
+                throw new QuestException("Can't store value in variable objective '" + id
+                        + "' because it is not an variable objective!");
+            }
         }
 
-        completeObjective(onlineProfile);
-    }
-
-    @Override
-    public String getDefaultDataInstruction(final Profile profile) {
-        return "";
+        getService().complete(profile);
     }
 }

@@ -1,1 +1,1 @@
-adapt to BQ 3.0.0-DEV-562
+adapt to BQ 3.0.0-DEV-680

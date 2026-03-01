@@ -1,21 +1,18 @@
 package de.ree.theos.bq.objective;
 
-import org.betonquest.betonquest.BetonQuest;
 import org.betonquest.betonquest.api.DefaultObjective;
 import org.betonquest.betonquest.api.QuestException;
+import org.betonquest.betonquest.api.identifier.ObjectiveIdentifier;
 import org.betonquest.betonquest.api.instruction.Argument;
-import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.instruction.type.BlockSelector;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.profile.Profile;
-import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
+import org.betonquest.betonquest.api.quest.objective.service.ObjectiveService;
+import org.betonquest.betonquest.api.service.objective.ObjectiveManager;
 import org.betonquest.betonquest.quest.objective.variable.VariableObjective;
 import org.betonquest.betonquest.quest.placeholder.location.LocationFormationMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +22,12 @@ import java.util.Map;
 /**
  * Requires to place a block and stores the location in a variable.
  */
-public class PlaceBlockStoreLocationObjective extends DefaultObjective implements Listener {
+public class PlaceBlockStoreLocationObjective extends DefaultObjective {
+
+    /**
+     * Objective manager to get requested objective.
+     */
+    private final ObjectiveManager manager;
 
     /**
      * Block Selector parameter.
@@ -35,7 +37,7 @@ public class PlaceBlockStoreLocationObjective extends DefaultObjective implement
     /**
      * A {@link VariableObjective} and key where the chat message should be stored.
      */
-    private final Argument<Map.Entry<ObjectiveID, String>> variable;
+    private final Argument<Map.Entry<ObjectiveIdentifier, String>> variable;
 
     /**
      * Ulf mode to use for storing the location.
@@ -68,7 +70,8 @@ public class PlaceBlockStoreLocationObjective extends DefaultObjective implement
     /**
      * Create a new Objective.
      *
-     * @param instruction  the user provided instruction string
+     * @param service      the {@link ObjectiveService} for this objective
+     * @param manager      manager to get requested objective
      * @param selector     the block selector to match placed block
      * @param mode         the ulf mode to use for the stored location
      * @param variable     the variable to store the location into
@@ -77,14 +80,15 @@ public class PlaceBlockStoreLocationObjective extends DefaultObjective implement
      * @param location     the location of the block
      * @param region       the second location defining a region
      * @param ignoreCancel the ignore cancel flag
-     * @throws QuestException when the Instruction is invalid or the VariableObjective does not exist
      */
-    public PlaceBlockStoreLocationObjective(final Instruction instruction, final Argument<BlockSelector> selector,
-            final Argument<LocationFormationMode> mode, final Argument<Map.Entry<ObjectiveID, String>> variable,
+    public PlaceBlockStoreLocationObjective(
+            final ObjectiveService service, final ObjectiveManager manager, final Argument<BlockSelector> selector,
+            final Argument<LocationFormationMode> mode, final Argument<Map.Entry<ObjectiveIdentifier, String>> variable,
             final @Nullable Argument<Vector> vector, final boolean exactMatch,
             final @Nullable Argument<Location> location, final @Nullable Argument<Location> region, final boolean ignoreCancel
-    ) throws QuestException {
-        super(instruction);
+    ) {
+        super(service);
+        this.manager = manager;
         this.selector = selector;
         this.mode = mode;
         this.vector = vector;
@@ -99,36 +103,28 @@ public class PlaceBlockStoreLocationObjective extends DefaultObjective implement
      *
      * @param event the event that triggered this method
      */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockPlace(final BlockPlaceEvent event) {
-        qeHandler.handle(() -> {
-            final OnlineProfile onlineProfile = profileProvider.getProfile(event.getPlayer());
-            final BlockSelector blockSelector = selector.getValue(onlineProfile);
-            final Block block = event.getBlock();
-            final Location location = block.getLocation();
-            if (containsPlayer(onlineProfile)
-                    && blockSelector.match(block, exactMatch)
-                    && checkConditions(onlineProfile)
-                    && checkLocation(location, onlineProfile)) {
-                final Map.Entry<ObjectiveID, String> variable = this.variable.getValue(onlineProfile);
-                final ObjectiveID id = variable.getKey();
-                if (BetonQuest.getInstance().getQuestTypeApi()
-                        .getObjective(id) instanceof VariableObjective variableObjective) {
-                    if (vector != null) {
-                        location.add(vector.getValue(onlineProfile));
-                    }
-                    final String serialized = mode.getValue(onlineProfile).getFormattedLocation(location, 0);
-                    if (!variableObjective.store(onlineProfile, variable.getValue(), serialized)) {
-                        throw new QuestException("Can't store value in variable objective '" + id
-                                + "' because it is not active for the player!");
-                    }
-                    completeObjective(onlineProfile);
-                } else {
-                    throw new QuestException("Can't store value in objective '" + id
-                            + "' because it is not a variable objective!");
+    public void onBlockPlace(final BlockPlaceEvent event, final OnlineProfile onlineProfile) throws QuestException {
+        final BlockSelector blockSelector = selector.getValue(onlineProfile);
+        final Block block = event.getBlock();
+        final Location location = block.getLocation();
+        if (blockSelector.match(block, exactMatch) && checkLocation(location, onlineProfile)) {
+            final Map.Entry<ObjectiveIdentifier, String> variable = this.variable.getValue(onlineProfile);
+            final ObjectiveIdentifier id = variable.getKey();
+            if (manager.getObjective(id) instanceof VariableObjective variableObjective) {
+                if (vector != null) {
+                    location.add(vector.getValue(onlineProfile));
                 }
+                final String serialized = mode.getValue(onlineProfile).getFormattedLocation(location, 0);
+                if (!variableObjective.store(onlineProfile, variable.getValue(), serialized)) {
+                    throw new QuestException("Can't store value in variable objective '" + id
+                            + "' because it is not active for the player!");
+                }
+                getService().complete(onlineProfile);
+            } else {
+                throw new QuestException("Can't store value in objective '" + id
+                        + "' because it is not a variable objective!");
             }
-        });
+        }
     }
 
     private boolean checkLocation(final Location loc, final Profile profile) throws QuestException {
@@ -161,15 +157,5 @@ public class PlaceBlockStoreLocationObjective extends DefaultObjective implement
 
     private boolean inWorld(final Location range1, final Location range2, final Location pos) {
         return range1.getWorld().equals(range2.getWorld()) && range2.getWorld().equals(pos.getWorld());
-    }
-
-    @Override
-    public String getProperty(final String name, final Profile profile) {
-        return "";
-    }
-
-    @Override
-    public String getDefaultDataInstruction(final Profile profile) {
-        return "";
     }
 }

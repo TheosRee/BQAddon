@@ -3,30 +3,33 @@ package de.ree.theos.bq;
 import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.config.quest.QuestPackage;
 import org.betonquest.betonquest.api.config.quest.QuestPackageManager;
+import org.betonquest.betonquest.api.identifier.IdentifierFactory;
+import org.betonquest.betonquest.api.identifier.ObjectiveIdentifier;
 import org.betonquest.betonquest.api.instruction.argument.InstructionArgumentParser;
-import org.betonquest.betonquest.api.quest.Placeholders;
-import org.betonquest.betonquest.api.quest.objective.ObjectiveID;
+import org.betonquest.betonquest.api.service.placeholder.PlaceholderManager;
 
 import java.util.Map;
 
 /**
  * Parses a string to an objective id and variable key.
  */
-public class VariableParser implements InstructionArgumentParser<Map.Entry<ObjectiveID, String>> {
-    /**
-     * The default instance of {@link VariableParser}.
-     */
-    public static final VariableParser VARIABLE = new VariableParser();
+public class VariableParser implements InstructionArgumentParser<Map.Entry<ObjectiveIdentifier, String>> {
+
+    private final IdentifierFactory<ObjectiveIdentifier> identifierFactory;
+
+    public VariableParser(final IdentifierFactory<ObjectiveIdentifier> identifierFactory) {
+        this.identifierFactory = identifierFactory;
+    }
 
     @Override
-    public Map.Entry<ObjectiveID, String> apply(final Placeholders placeholders, final QuestPackageManager questPackageManager,
-            final QuestPackage questPackage,
-            final String string) throws QuestException {
+    public Map.Entry<ObjectiveIdentifier, String> apply(final PlaceholderManager placeholders,
+            final QuestPackageManager questPackageManager,
+            final QuestPackage questPackage, final String string) throws QuestException {
         final String[] split = string.split("#");
         if (split.length != 2) {
             throw new QuestException("Invalid variable '" + string + "' does not contain ID and Key!");
         }
-        final ObjectiveID ObjectiveID = new ObjectiveID(placeholders, questPackageManager, questPackage, split[0]);
+        final ObjectiveIdentifier ObjectiveID = identifierFactory.parseIdentifier(questPackage, split[0]);
         return Map.entry(ObjectiveID, split[1]);
     }
 }

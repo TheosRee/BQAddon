@@ -3,7 +3,7 @@ package de.ree.theos.bq.playtime;
 import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
-import org.betonquest.betonquest.api.quest.placeholder.online.OnlinePlaceholder;
+import org.betonquest.betonquest.api.quest.placeholder.OnlinePlaceholder;
 import org.betonquest.betonquest.quest.action.folder.TimeUnit;
 import org.bukkit.Statistic;
 
