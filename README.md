@@ -18,16 +18,24 @@ which is "too new" for what BetonQuest supports.
 
 ## Actions
 
-### - `drop`
+### Arm Swing
+
+Swings an Arm.
+
+The only argument is either `HAND` or `OFF_HAND`.
+
+#### Usage: `swingArm <hand>`
+
+### Drop
 
 Expands the normal
 [`drop` action](https://betonquest.org/DEV/Documentation/Scripting/Building-Blocks/Actions-List/#drop)
-with a modes:
+with a mode:
 
 - `PERSONAL`: Allows only the player the action was executed for to pick up the item
 - `PRIVATE`: Shows the dropped item only for the player the action was executed for, includes `PERSONAL`
 
-#### Usage: `drop reward:10 mode:PRIVATE`
+#### Usage: `drop items [location:<Location>] [mode:<Modes>]`
 
 ## Objectives
 
@@ -94,11 +102,3 @@ It also has the `left` and `rawseconds` properties, similar to the `delay` objec
 ### Placeholder
 
 #### Usage: `%playtime%` or `%playtime.<unit>%`
-
-## Arm Swing
-
-Swings an Arm.
-
-The only argument is either `HAND` or `OFF_HAND`.
-
-#### Usage: `swingArm <hand>`
