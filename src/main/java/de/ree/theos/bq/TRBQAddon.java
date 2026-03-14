@@ -1,6 +1,8 @@
 package de.ree.theos.bq;
 
 import de.ree.theos.bq.animation.SwingArmEventFactory;
+import de.ree.theos.bq.drop.DropListener;
+import de.ree.theos.bq.drop.PrivateDropActionFactory;
 import de.ree.theos.bq.objective.ChatObjectiveFactory;
 import de.ree.theos.bq.objective.PlaceBlockStoreLocationObjectiveFactory;
 import de.ree.theos.bq.playtime.PlaytimeConditionFactory;
@@ -11,6 +13,7 @@ import org.betonquest.betonquest.api.BetonQuestApi;
 import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.identifier.IdentifierFactory;
 import org.betonquest.betonquest.api.identifier.ObjectiveIdentifier;
+import org.betonquest.betonquest.api.service.action.ActionRegistry;
 import org.betonquest.betonquest.api.service.objective.ObjectiveManager;
 import org.betonquest.betonquest.api.service.objective.ObjectiveRegistry;
 import org.betonquest.betonquest.api.service.objective.Objectives;
@@ -45,6 +48,10 @@ public final class TRBQAddon extends JavaPlugin {
         objectiveRegistry.register("playtime", new PlaytimeObjectiveFactory());
         api.placeholders().registry().register("playtime", new PlaytimeVariableFactory());
 
-        api.actions().registry().register("swingArm", new SwingArmEventFactory());
+        final ActionRegistry actionRegistry = api.actions().registry();
+        actionRegistry.register("swingArm", new SwingArmEventFactory());
+
+        actionRegistry.registerCombined("drop", new PrivateDropActionFactory(this, api.profiles()));
+        getServer().getPluginManager().registerEvents(new DropListener(this), this);
     }
 }

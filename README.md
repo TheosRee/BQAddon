@@ -16,6 +16,19 @@ which is "too new" for what BetonQuest supports.
 
 # Features
 
+## Actions
+
+### - `drop`
+
+Expands the normal
+[`drop` action](https://betonquest.org/DEV/Documentation/Scripting/Building-Blocks/Actions-List/#drop)
+with a modes:
+
+- `PERSONAL`: Allows only the player the action was executed for to pick up the item
+- `PRIVATE`: Shows the dropped item only for the player the action was executed for, includes `PERSONAL`
+
+#### Usage: `drop reward:10 mode:PRIVATE`
+
 ## Objectives
 
 ### - `chat`
