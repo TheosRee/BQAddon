@@ -8,35 +8,31 @@ import de.ree.theos.bq.objective.PlaceBlockStoreLocationObjectiveFactory;
 import de.ree.theos.bq.playtime.PlaytimeConditionFactory;
 import de.ree.theos.bq.playtime.PlaytimeObjectiveFactory;
 import de.ree.theos.bq.playtime.PlaytimeVariableFactory;
-import org.betonquest.betonquest.BetonQuest;
 import org.betonquest.betonquest.api.BetonQuestApi;
 import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.identifier.IdentifierFactory;
 import org.betonquest.betonquest.api.identifier.ObjectiveIdentifier;
+import org.betonquest.betonquest.api.integration.Integration;
+import org.betonquest.betonquest.api.integration.IntegrationService;
 import org.betonquest.betonquest.api.service.action.ActionRegistry;
 import org.betonquest.betonquest.api.service.objective.ObjectiveManager;
 import org.betonquest.betonquest.api.service.objective.ObjectiveRegistry;
 import org.betonquest.betonquest.api.service.objective.Objectives;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.logging.Level;
-
 /**
  * TheosRee's BetonQuest AddOn.
  */
-public final class TRBQAddon extends JavaPlugin {
+public final class TRBQAddon extends JavaPlugin implements Integration {
     @Override
-    public void onEnable() {
-        final BetonQuestApi api = BetonQuest.getInstance().getBetonQuestApi();
-        final IdentifierFactory<ObjectiveIdentifier> identifierFactory;
-        try {
-            identifierFactory = api.identifiers().getFactory(ObjectiveIdentifier.class);
-        } catch (final QuestException e) {
-            getLogger().log(Level.SEVERE, "Could not create identifier factory for ObjectiveIdentifier: " + e.getMessage(), e);
-            getLogger().log(Level.WARNING, "Plugin will not add functionality and disable.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+    public void onLoad() {
+        final IntegrationService service = getServer().getServicesManager().load(IntegrationService.class);
+        service.withPolicy(null).register(this, () -> this);
+    }
+
+    @Override
+    public void enable(final BetonQuestApi api) throws QuestException {
+        final IdentifierFactory<ObjectiveIdentifier> identifierFactory = api.identifiers().getFactory(ObjectiveIdentifier.class);
         final VariableParser variableParser = new VariableParser(identifierFactory);
         final Objectives objectives = api.objectives();
         final ObjectiveRegistry objectiveRegistry = objectives.registry();
@@ -52,6 +48,16 @@ public final class TRBQAddon extends JavaPlugin {
         actionRegistry.register("swingArm", new SwingArmEventFactory());
 
         actionRegistry.registerCombined("drop", new PrivateDropActionFactory(this, api.profiles()));
-        getServer().getPluginManager().registerEvents(new DropListener(this), this);
+        api.bukkit().registerEvents(new DropListener(this));
+    }
+
+    @Override
+    public void postEnable(final BetonQuestApi api) {
+        // Empty
+    }
+
+    @Override
+    public void disable() {
+        // Empty
     }
 }
