@@ -27,7 +27,8 @@ public final class TRBQAddon extends JavaPlugin implements Integration {
     @Override
     public void onLoad() {
         final IntegrationService service = getServer().getServicesManager().load(IntegrationService.class);
-        service.withPolicy(null).register(this, () -> this);
+        assert service != null;
+        service.withPolicies().register(this, () -> this);
     }
 
     @Override
