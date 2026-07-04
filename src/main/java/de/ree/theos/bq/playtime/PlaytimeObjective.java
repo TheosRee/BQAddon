@@ -138,7 +138,7 @@ public class PlaytimeObjective extends DefaultObjective {
     }
 
     private Component parseVariableLeft(final Profile profile) throws QuestException {
-        final PluginMessage pluginMessage = BetonQuest.getInstance().getPluginMessage();
+        final PluginMessage pluginMessage = BetonQuest.getInstance().getComponentLoader().get(PluginMessage.class);
         final Component daysWord = pluginMessage.getMessage(profile, "days");
         final Component daysWordSingular = pluginMessage.getMessage(profile, "days_singular");
         final Component hoursWord = pluginMessage.getMessage(profile, "hours");
