@@ -7,3 +7,5 @@ description: BetonQuest Addon for development and experimental features.
 website: https://github.com/TheosRee/BQAddon
 depend:
   - BetonQuest
+softdepend:
+  - Citizens

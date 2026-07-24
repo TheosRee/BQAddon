@@ -2,7 +2,6 @@ package de.ree.theos.bq.npc;
 
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
-import net.citizensnpcs.api.event.NPCCloneEvent;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import net.citizensnpcs.api.trait.Trait;
@@ -81,9 +80,7 @@ public class PlayerCitizensWrapper implements NpcWrapper<NPC> {
         copy.removeTrait(PlayerFilter.class);
         final PlayerFilter filter = copy.getOrAddTrait(PlayerFilter.class);
         filter.setAllowlist();
-        filter.clear();
         filter.addPlayer(uuid);
-        new NPCCloneEvent(original, copy).callEvent();
         return copy;
     }
 
