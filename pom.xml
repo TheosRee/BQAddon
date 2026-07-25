@@ -6,7 +6,7 @@
 
     <groupId>de.ree.theos</groupId>
     <artifactId>bq</artifactId>
-    <version>1.5.11</version>
+    <version>1.5.12</version>
     <packaging>jar</packaging>
 
     <name>TR-BQ-Addon</name>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.betonquest</groupId>
             <artifactId>betonquest</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>3.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

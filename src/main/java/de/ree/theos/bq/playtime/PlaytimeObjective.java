@@ -14,7 +14,7 @@ import org.betonquest.betonquest.api.quest.objective.ObjectiveData;
 import org.betonquest.betonquest.api.quest.objective.service.ObjectiveProperties;
 import org.betonquest.betonquest.api.quest.objective.service.ObjectiveService;
 import org.betonquest.betonquest.config.PluginMessage;
-import org.betonquest.betonquest.quest.action.folder.TimeUnit;
+import org.betonquest.betonquest.lib.argument.type.TimeUnit;
 import org.bukkit.Statistic;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;

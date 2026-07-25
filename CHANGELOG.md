@@ -1,1 +1,1 @@
-TODO increment version
+update to BQ 3.2.0

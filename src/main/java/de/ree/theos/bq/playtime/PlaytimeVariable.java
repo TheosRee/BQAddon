@@ -4,7 +4,7 @@ import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.profile.OnlineProfile;
 import org.betonquest.betonquest.api.quest.placeholder.OnlinePlaceholder;
-import org.betonquest.betonquest.quest.action.folder.TimeUnit;
+import org.betonquest.betonquest.lib.argument.type.TimeUnit;
 import org.bukkit.Statistic;
 
 /**
@@ -29,10 +29,6 @@ public class PlaytimeVariable implements OnlinePlaceholder {
     @Override
     public String getValue(final OnlineProfile profile) throws QuestException {
         final int playedTicks = profile.getPlayer().getStatistic(Statistic.TOTAL_WORLD_TIME);
-        return switch (unit.getValue(profile)) {
-            case TICKS -> String.valueOf(playedTicks);
-            case SECONDS -> String.valueOf(playedTicks / 20);
-            case MINUTES -> String.valueOf(playedTicks / (20 * 60));
-        };
+        return String.valueOf(playedTicks / unit.getValue(profile).getTicks(1));
     }
 }

@@ -4,7 +4,7 @@ import org.betonquest.betonquest.api.QuestException;
 import org.betonquest.betonquest.api.instruction.Argument;
 import org.betonquest.betonquest.api.profile.Profile;
 import org.betonquest.betonquest.api.quest.condition.PlayerCondition;
-import org.betonquest.betonquest.quest.action.folder.TimeUnit;
+import org.betonquest.betonquest.lib.argument.type.TimeUnit;
 import org.bukkit.Statistic;
 
 /**

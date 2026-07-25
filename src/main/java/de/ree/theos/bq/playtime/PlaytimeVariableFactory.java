@@ -6,7 +6,7 @@ import org.betonquest.betonquest.api.instruction.Instruction;
 import org.betonquest.betonquest.api.quest.placeholder.OnlinePlaceholderAdapter;
 import org.betonquest.betonquest.api.quest.placeholder.PlayerPlaceholder;
 import org.betonquest.betonquest.api.quest.placeholder.PlayerPlaceholderFactory;
-import org.betonquest.betonquest.quest.action.folder.TimeUnit;
+import org.betonquest.betonquest.lib.argument.type.TimeUnit;
 
 /**
  * Factory to create {@link PlaytimeVariable}s from {@link Instruction}s.
